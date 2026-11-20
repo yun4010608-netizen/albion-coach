@@ -1,0 +1,119 @@
+{
+  "title": "알비온 코치 — 화면 세계 고르기",
+  "question": "추첨으로 '한국 증권 시세판' 방향이 배정됐습니다. 그대로 갈지, 다른 카드를 고를지, 다시 뽑을지 골라 주세요.",
+  "options": [
+    {
+      "id": "assigned",
+      "kind": "assigned",
+      "label": "시세판 (Korean quote board)",
+      "kicker": "THE ROLL",
+      "lineage": "Korean brokerage quote screens: red ▲ up, blue ▼ down, tabular price rows",
+      "thesis": "Refining profit read like a Korean stock quote: cities ranked as a 호가 ladder, gain red, loss blue.",
+      "palette": ["#16181D", "#ECE8DF", "#E8413A", "#3B7BEA", "#F2B33D"],
+      "materials": ["tabular numerals", "1px rules", "red/blue market convention"],
+      "viewport": "Top bar with tabs (코치 / 정제 계산기) and Asia badge; left: filters + city ladder with profit bars around a centre axis; right: coach chat.",
+      "risk": "Can read as a generic dark finance app if the ladder is drawn timidly.",
+      "raised": [
+        {"from": "challenger-centre-rail", "raise": "Every rule, bar edge and axis at one device pixel; palette held to graphite, numeral white and the two market colours, amber only for refresh."},
+        {"from": "challenger-split-flap", "raise": "Columns never move: fixed-width tabular cells, so a price refresh changes digits, never layout."},
+        {"from": "challenger-metro", "raise": "No card chrome: the profit figure at display scale carries the hierarchy, not boxes."},
+        {"from": "challenger-saville", "raise": "Nothing labelled twice: each city named once per row, its refining bonus as a single tincture chip."},
+        {"from": "challenger-goods", "raise": "Fixed furniture per city row (bonus chip, data age) in the same slot on every refresh."}
+      ],
+      "html": ".impeccable/mocks/decision/assigned.html"
+    },
+    {
+      "id": "model-pick",
+      "kind": "pick",
+      "label": "Royal city tinctures",
+      "kicker": "IMPECCABLE’S PICK",
+      "lineage": "heraldic tinctures of Albion's royal cities (Martlock azure, Lymhurst vert, Bridgewatch or, Thetford purpure, Caerleon gules, Fort Sterling argent)",
+      "thesis": "Every city is its banner colour; the table is a row of tabards and the best city wears its colour at full field.",
+      "palette": ["#1B1916", "#E9E4D8", "#2C5AA0", "#3E7D3A", "#D98A1F", "#6B3F8E", "#9E2A2B"],
+      "materials": ["flat tincture fields", "banner-cut row ends"],
+      "viewport": "Same shell; the leading city row floods with its tincture, others carry a tincture edge.",
+      "risk": "Closest to familiar fantasy-game UI; seven hues compete if not disciplined.",
+      "html": ".impeccable/mocks/decision/model-pick.html"
+    },
+    {
+      "id": "challenger-gate-board",
+      "kind": "challenger",
+      "catalogId": "vernacular-ephemera-boarding-pass-and-gate-board",
+      "label": "Gate board",
+      "verdict": "competitive",
+      "lineage": "airport departure boards and boarding passes",
+      "thesis": "Cities rerank in place like flights; a changed price stays lit until you have seen it.",
+      "palette": ["#F4F4F0", "#121212", "#FF5A1F", "#8A8A85"],
+      "materials": ["segmented pass", "monospaced block"],
+      "viewport": "Light board of city rows ranked by profit, the chosen recipe as a segmented pass on top.",
+      "case": "Fuses cleanly (ranking is the job) and holds product clarity; loses audience identification to the Korean market convention.",
+      "risk": "Light ground glares beside a dark game at night.",
+      "html": ".impeccable/mocks/decision/challenger-gate-board.html",
+      "hero": "https://impeccable.style/worlds/cards/vernacular-ephemera-boarding-pass-and-gate-board-hero.webp"
+    },
+    {
+      "id": "challenger-centre-rail", "kind": "challenger", "catalogId": "rw-centre-rail-reference-setting",
+      "label": "Centre-rail reference setting", "verdict": "declined",
+      "lineage": "wide-margin scholarly editions",
+      "thesis": "Two text columns around a vermilion rail of keys.", "palette": ["#1A1714", "#EFE6D6", "#C2402A"],
+      "materials": ["ruling engine hairlines"], "viewport": "Two columns, apparatus in a wide margin.",
+      "case": "A gamer beside a game does not identify with a critical edition; the margin wastes phone width.",
+      "risk": "Reads as a book, not a tool.", "kept": "One-device-pixel ruling and a three-value palette discipline.",
+      "hero": "https://impeccable.style/worlds/cards/rw-centre-rail-reference-setting-hero.webp"
+    },
+    {
+      "id": "challenger-goods", "kind": "challenger", "catalogId": "pop-culture-shelf-character-goods-catalog",
+      "label": "Character goods catalog", "verdict": "declined",
+      "lineage": "mascot merchandise catalogs",
+      "thesis": "Cities as ranked mascots with fixed name plates.", "palette": ["#F9D6E0", "#CDE8F6", "#FFF1B8", "#FFFFFF"],
+      "materials": ["pastel grounds", "white keylines"], "viewport": "Pastel grid of city cells.",
+      "case": "Pastel cuteness fights Albion's full-loot grit; cells hide the numbers.",
+      "risk": "Toy-like.", "kept": "Fixed personal furniture per entry in a fixed slot.",
+      "hero": "https://impeccable.style/worlds/cards/pop-culture-shelf-character-goods-catalog-hero.webp"
+    },
+    {
+      "id": "challenger-metro", "kind": "challenger", "catalogId": "digital-design-canon-metro-typographic-tiles",
+      "label": "Metro tiles", "verdict": "declined",
+      "lineage": "flat typographic tile interfaces",
+      "thesis": "Giant cropped type and live tiles.", "palette": ["#000000", "#00ABEC", "#FFFFFF"],
+      "materials": ["flat tiles"], "viewport": "Panorama of city tiles.",
+      "case": "Cropped giant type breaks Korean labels and hides the table.",
+      "risk": "Panorama navigation is unfamiliar for a two-view tool.", "kept": "Chrome deleted: type scale carries hierarchy.",
+      "hero": "https://impeccable.style/worlds/cards/digital-design-canon-metro-typographic-tiles-hero.webp"
+    },
+    {
+      "id": "challenger-saville", "kind": "challenger", "catalogId": "brand-identity-canon-saville-catalog-sleeve",
+      "label": "Catalog sleeve", "verdict": "declined",
+      "lineage": "coded record-label identities",
+      "thesis": "Colour codes stand in for words.", "palette": ["#0B0B0B", "#FFFFFF", "#E63B2E", "#F5C400"],
+      "materials": ["hairline plot", "colour code strip"], "viewport": "One plot on matte black.",
+      "case": "Coded labels slow a glance-and-decide task.",
+      "risk": "Cryptic.", "kept": "Nothing labelled twice.",
+      "hero": "https://impeccable.style/worlds/cards/brand-identity-canon-saville-catalog-sleeve-hero.webp"
+    },
+    {
+      "id": "challenger-split-flap", "kind": "challenger", "catalogId": "signals-instruments-split-flap-concourse",
+      "label": "Split-flap concourse", "verdict": "declined",
+      "lineage": "rail departure boards",
+      "thesis": "Rows of flapping characters.", "palette": ["#151515", "#F0F0F0", "#F2A900"],
+      "materials": ["flap cells", "brushed steel"], "viewport": "A departure board of cities.",
+      "case": "An instrument costume on a working screen; the cascade adds noise to price refreshes.",
+      "risk": "Costume.", "kept": "Columns never move, only values change.",
+      "hero": "https://impeccable.style/worlds/cards/signals-instruments-split-flap-concourse-hero.webp"
+    }
+  ],
+  "reroll": {"registers": ["safer", "bolder"]},
+  "buildPath": {"value": "code"},
+  "canon": true,
+  "canonCard": {
+    "kind": "canon",
+    "label": "The category standard",
+    "thesis": "The dark gaming-tool dashboard community Albion sites ship, executed cleanly.",
+    "palette": ["#1E1F24", "#2A2C33", "#E8C547", "#9AA0A6"],
+    "materials": ["grey panels", "gold accent"],
+    "viewport": "Sidebar nav, filter bar, sortable table, chat drawer.",
+    "risk": "Indistinguishable from every Albion fan tool by design.",
+    "html": ".impeccable/mocks/decision/canon.html"
+  },
+  "steer": true
+}

@@ -1,0 +1,18 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8">
+<style>
+:root{--g:#1E1F24;--p:#2A2C33;--ink:#E6E6E6;--mute:#9AA0A6;--gold:#E8C547}
+*{box-sizing:border-box;margin:0}body{width:1440px;height:900px;overflow:hidden;background:var(--g);color:var(--ink);font-family:"Pretendard","Apple SD Gothic Neo",system-ui,sans-serif;display:grid;grid-template-columns:220px 1fr 400px}
+nav{background:var(--p);padding:20px}nav b{display:block;font-size:18px;color:var(--gold);margin-bottom:24px}nav span{display:block;padding:10px 12px;border-radius:6px;font-size:15px;color:var(--mute)}nav .on{background:#3A3D46;color:var(--ink)}
+.calc{padding:24px}.filters{display:flex;gap:10px;margin-bottom:20px}.filters span{background:var(--p);border-radius:6px;padding:10px 14px;font-size:14px}
+.card{background:var(--p);border-radius:10px;padding:16px}table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:12px;font-size:15px;border-bottom:1px solid #383B44}th{color:var(--mute);font-size:13px}
+.g{color:#6CCB7A}.r{color:#E06C6C}
+aside{background:var(--p);padding:20px;display:flex;flex-direction:column}.msg{background:#33363E;border-radius:10px;padding:12px;margin-bottom:12px;font-size:15px}.input{margin-top:auto;background:#33363E;border-radius:8px;padding:14px;color:var(--mute)}
+</style></head><body>
+<nav><b>Albion Coach</b><span>코치</span><span class="on">정제 계산기</span></nav>
+<section class="calc"><div class="filters"><span>광석</span><span>T5</span><span>.0</span><span>프리미엄</span></div>
+<div class="card"><table><tr><th>도시</th><th>매입</th><th>매도</th><th>손익</th></tr>
+<tr><td>Thetford</td><td>1,230</td><td>1,240</td><td class="g">+381</td></tr><tr><td>Martlock</td><td>1,206</td><td>1,210</td><td class="g">+132</td></tr>
+<tr><td>Lymhurst</td><td>1,250</td><td>1,198</td><td class="g">+89</td></tr><tr><td>Bridgewatch</td><td>1,304</td><td>1,150</td><td class="r">-12</td></tr>
+<tr><td>Fort Sterling</td><td>1,351</td><td>1,105</td><td class="r">-98</td></tr><tr><td>Caerleon</td><td>1,396</td><td>1,180</td><td class="r">-140</td></tr></table></div></section>
+<aside><div class="msg">T5 광석 캐는 중인데 바로 팔까, 정제할까?</div><div class="msg">Thetford에서 정제하세요. 개당 약 381은화.</div><div class="input">질문을 입력하세요</div></aside>
+</body></html>

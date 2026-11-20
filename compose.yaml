@@ -1,0 +1,31 @@
+services:
+  app:
+    build: .
+    image: albion-coach:local
+    environment:
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      CLAUDE_MODEL: ${CLAUDE_MODEL:-claude-sonnet-5-5}
+    deploy:
+      replicas: 2
+    # A coach answer can take up to 3 minutes; let in-flight answers finish on stop.
+    stop_grace_period: 210s
+    healthcheck:
+      test: ["CMD", "/albion-coach", "healthcheck"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+      start_period: 3s
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+
+  lb:
+    # 1.30.7: 2026-11-18 fix for CVE-2026-123007 (HTTP/2 RCE) and nine others.
+    image: nginx:1.30.7-alpine3.24
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      app:
+        condition: service_healthy

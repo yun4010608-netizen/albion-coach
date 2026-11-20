@@ -1,0 +1,28 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8">
+<style>
+:root{--g:#F4F4F0;--ink:#121212;--mute:#8A8A85;--al:#FF5A1F;--rule:#D6D6D0}
+*{box-sizing:border-box;margin:0}body{width:1440px;height:900px;overflow:hidden;background:var(--g);color:var(--ink);font-family:"Pretendard","Apple SD Gothic Neo",system-ui,sans-serif}
+.m{font-family:ui-monospace,Menlo,monospace;font-variant-numeric:tabular-nums}
+header{height:56px;display:flex;align-items:center;gap:32px;padding:0 28px;background:var(--ink);color:var(--g)}header b{font-size:18px}
+.tabs span{padding:8px 14px;font-size:15px;opacity:.6}.tabs .on{opacity:1;box-shadow:inset 0 -2px var(--g)}
+main{display:grid;grid-template-columns:1fr 440px;height:844px}.calc{padding:24px 28px;border-right:1px solid var(--rule)}
+.pass{display:grid;grid-template-columns:repeat(4,1fr) 1.4fr;border:1px solid var(--ink);margin-bottom:24px}
+.pass div{padding:14px 18px;border-right:1px dashed var(--ink)}.pass div:last-child{border:0;background:var(--ink);color:var(--g)}
+.pass small{display:block;font-size:12px;color:var(--mute)}.pass b{font-size:26px}
+table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:14px 10px;border-bottom:1px solid var(--rule);font-size:16px}th{font-size:12px;color:var(--mute);letter-spacing:.08em}
+.lit td{background:#FFE7DC}.lit .chg{color:var(--al);font-weight:700}
+.coach{padding:24px;display:flex;flex-direction:column}.msg{padding:14px 0;font-size:15px;line-height:1.6;border-bottom:1px solid var(--rule)}.input{margin-top:auto;border:1px solid var(--ink);padding:14px;color:var(--mute)}
+</style></head><body>
+<header><b>알비온 코치</b><nav class="tabs"><span>코치</span><span class="on">정제 계산기</span></nav></header>
+<main><section class="calc">
+<div class="pass m"><div><small>자원</small><b>광석</b></div><div><small>티어</small><b>T5.0</b></div><div><small>투입</small><b>3+1</b></div><div><small>리턴율</small><b>36.7%</b></div><div><small>최적 도시</small><b>테트포드 +381</b></div></div>
+<table class="m"><tr><th>순위</th><th>도시</th><th>매입</th><th>매도</th><th>손익</th><th>갱신</th></tr>
+<tr class="lit"><td>01</td><td>테트포드</td><td>1,230</td><td>1,240</td><td class="chg">+381</td><td>3분</td></tr>
+<tr><td>02</td><td>마트록</td><td>1,206</td><td>1,210</td><td>+132</td><td>12분</td></tr>
+<tr><td>03</td><td>림허스트</td><td>1,250</td><td>1,198</td><td>+89</td><td>25분</td></tr>
+<tr><td>04</td><td>브리지워치</td><td>1,304</td><td>1,150</td><td>−12</td><td>41분</td></tr>
+<tr><td>05</td><td>포트 스털링</td><td>1,351</td><td>1,105</td><td>−98</td><td>1시간</td></tr>
+<tr><td>06</td><td>카에를레온</td><td>1,396</td><td>1,180</td><td>−140</td><td>8분</td></tr></table>
+</section>
+<aside class="coach"><div class="msg">T5 광석 캐는 중인데 바로 팔까, 정제할까?</div><div class="msg">테트포드에서 정제하세요. 개당 약 381은화가 남습니다.</div><div class="input">질문을 입력하세요</div></aside>
+</main></body></html>

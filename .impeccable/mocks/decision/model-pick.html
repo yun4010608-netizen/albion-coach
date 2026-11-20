@@ -1,0 +1,26 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8">
+<style>
+:root{--g:#1B1916;--ink:#E9E4D8;--mute:#9A948A;--rule:#34302A}
+*{box-sizing:border-box;margin:0}body{width:1440px;height:900px;overflow:hidden;background:var(--g);color:var(--ink);font-family:"Pretendard","Apple SD Gothic Neo",system-ui,sans-serif}
+header{height:56px;display:flex;align-items:center;gap:32px;padding:0 28px;border-bottom:1px solid var(--rule)}header b{font-size:18px}
+.tabs span{padding:8px 14px;font-size:15px;color:var(--mute)}.tabs .on{color:var(--ink);box-shadow:inset 0 -2px var(--ink)}
+main{display:grid;grid-template-columns:1fr 440px;height:844px}.calc{padding:24px 28px;border-right:1px solid var(--rule)}
+.filters{display:flex;gap:10px;margin-bottom:22px}.filters span{border:1px solid var(--rule);padding:9px 14px;font-size:14px}
+.row{display:grid;grid-template-columns:220px 1fr 160px;align-items:center;height:72px;margin-bottom:8px;padding:0 24px;font-variant-numeric:tabular-nums;clip-path:polygon(0 0,100% 0,97% 50%,100% 100%,0 100%)}
+.row .city{font-size:20px;font-weight:700}.row .p{font-size:28px;text-align:right;font-weight:700}
+.lead{background:#6B3F8E;height:120px}.lead .p{font-size:56px}.lead .city{font-size:30px}
+.edge{border-left:10px solid}
+.coach{padding:24px;display:flex;flex-direction:column}.msg{padding:14px 0;font-size:15px;line-height:1.6;border-bottom:1px solid var(--rule)}.input{margin-top:auto;border:1px solid var(--rule);padding:14px;color:var(--mute)}
+</style></head><body>
+<header><b>알비온 코치</b><nav class="tabs"><span>코치</span><span class="on">정제 계산기</span></nav></header>
+<main><section class="calc">
+<div class="filters"><span>광석 → 금속괴</span><span>T5</span><span>.0</span><span>프리미엄</span></div>
+<div class="row lead"><span class="city">테트포드</span><span>정제 보너스 · 3분 전</span><span class="p">+381</span></div>
+<div class="row edge" style="border-color:#2C5AA0;background:#22252B"><span class="city">마트록</span><span>12분 전</span><span class="p">+132</span></div>
+<div class="row edge" style="border-color:#3E7D3A;background:#22261F"><span class="city">림허스트</span><span>25분 전</span><span class="p">+89</span></div>
+<div class="row edge" style="border-color:#D98A1F;background:#2A241B"><span class="city">브리지워치</span><span>41분 전</span><span class="p">−12</span></div>
+<div class="row edge" style="border-color:#E6E6E1;background:#26251F"><span class="city">포트 스털링</span><span>1시간 전</span><span class="p">−98</span></div>
+<div class="row edge" style="border-color:#9E2A2B;background:#2A1D1C"><span class="city">카에를레온</span><span>8분 전</span><span class="p">−140</span></div>
+</section>
+<aside class="coach"><div class="msg">T5 광석 캐는 중인데 바로 팔까, 정제할까?</div><div class="msg">테트포드에서 정제하세요. 개당 약 381은화가 남습니다.</div><div class="input">질문을 입력하세요</div></aside>
+</main></body></html>

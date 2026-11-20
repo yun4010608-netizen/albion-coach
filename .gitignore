@@ -1,0 +1,7 @@
+# secrets: the API key lives only here
+.env
+.env.*
+!.env.example
+# local design-review captures and decision-page state
+.impeccable/review/
+.impeccable/questions/

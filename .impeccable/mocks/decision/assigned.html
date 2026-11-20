@@ -1,0 +1,44 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8">
+<style>
+:root{--g:#16181D;--g2:#1D2026;--ink:#ECE8DF;--mute:#8C8F96;--up:#E8413A;--down:#3B7BEA;--amb:#F2B33D;--rule:#2C3038}
+*{box-sizing:border-box;margin:0}body{width:1440px;height:900px;overflow:hidden;background:var(--g);color:var(--ink);font-family:"Pretendard","Apple SD Gothic Neo",system-ui,sans-serif}
+.num{font-variant-numeric:tabular-nums;font-feature-settings:"tnum"}
+header{height:56px;display:flex;align-items:center;gap:32px;padding:0 28px;border-bottom:1px solid var(--rule)}
+header b{font-size:18px;letter-spacing:-.01em}.tabs{display:flex;gap:4px}.tabs span{padding:8px 14px;font-size:15px;color:var(--mute)}.tabs .on{color:var(--ink);box-shadow:inset 0 -2px var(--ink)}
+.badge{margin-left:auto;font-size:13px;color:var(--mute)}
+main{display:grid;grid-template-columns:1fr 440px;height:844px}
+.calc{padding:24px 28px;border-right:1px solid var(--rule)}
+.filters{display:flex;gap:10px;margin-bottom:20px}.filters span{border:1px solid var(--rule);padding:9px 14px;font-size:14px}
+.lead{display:flex;align-items:baseline;gap:20px;padding-bottom:18px;border-bottom:1px solid var(--rule)}
+.lead .big{font-size:64px;font-weight:700;color:var(--up);letter-spacing:-.02em}.lead .sub{font-size:24px}
+table{width:100%;border-collapse:collapse;margin-top:8px}td,th{padding:12px 8px;border-bottom:1px solid var(--rule);font-size:15px;text-align:right}th{color:var(--mute);font-weight:500;font-size:13px}
+td:first-child,th:first-child{text-align:left}
+.chip{display:inline-block;width:10px;height:10px;margin-right:8px;vertical-align:1px}
+.ladder{position:relative;width:260px;height:14px}.ladder:before{content:"";position:absolute;left:50%;top:-6px;bottom:-6px;border-left:1px solid var(--mute)}
+.bar{position:absolute;top:0;height:14px}.u{background:var(--up);left:50%}.d{background:var(--down);right:50%}
+.up{color:var(--up)}.dn{color:var(--down)}.age{color:var(--mute);font-size:13px}.fresh{color:var(--amb)}
+.coach{display:flex;flex-direction:column;padding:24px}
+.msg{padding:14px 16px;margin-bottom:14px;font-size:15px;line-height:1.6;border-left:2px solid var(--rule)}.me{border-left-color:var(--ink);background:var(--g2)}
+.input{margin-top:auto;border:1px solid var(--rule);padding:14px;font-size:15px;color:var(--mute)}
+</style></head><body>
+<header><b>알비온 코치</b><nav class="tabs"><span>코치</span><span class="on">정제 계산기</span></nav><span class="badge">Asia 서버 · 예시 데이터</span></header>
+<main>
+<section class="calc">
+<div class="filters"><span>광석 → 금속괴</span><span>T5</span><span>.0</span><span>프리미엄 ✓</span><span>포커스 없음</span></div>
+<div class="lead"><span class="sub">최적: 테트포드에서 정제</span><span class="big num">▲ +381</span><span class="sub num">은화/개 · 마진 31%</span></div>
+<table class="num">
+<tr><th>도시</th><th>광석 ×3</th><th>T4 금속괴</th><th>T5 금속괴</th><th>개당 손익</th><th style="text-align:center">손익</th><th>갱신</th></tr>
+<tr><td><i class="chip" style="background:#6B3F8E"></i>테트포드 <span class="age">보너스</span></td><td>300</td><td>330</td><td>1,240</td><td class="up">▲ 381</td><td><div class="ladder"><i class="bar u" style="width:96px"></i></div></td><td class="fresh">3분 전</td></tr>
+<tr><td><i class="chip" style="background:#2C5AA0"></i>마트록</td><td>288</td><td>342</td><td>1,210</td><td class="up">▲ 132</td><td><div class="ladder"><i class="bar u" style="width:34px"></i></div></td><td class="age">12분 전</td></tr>
+<tr><td><i class="chip" style="background:#3E7D3A"></i>림허스트</td><td>305</td><td>335</td><td>1,198</td><td class="up">▲ 89</td><td><div class="ladder"><i class="bar u" style="width:23px"></i></div></td><td class="age">25분 전</td></tr>
+<tr><td><i class="chip" style="background:#D98A1F"></i>브리지워치</td><td>318</td><td>350</td><td>1,150</td><td class="dn">▼ 12</td><td><div class="ladder"><i class="bar d" style="width:4px"></i></div></td><td class="age">41분 전</td></tr>
+<tr><td><i class="chip" style="background:#E6E6E1"></i>포트 스털링</td><td>330</td><td>361</td><td>1,105</td><td class="dn">▼ 98</td><td><div class="ladder"><i class="bar d" style="width:26px"></i></div></td><td class="age">1시간 전</td></tr>
+<tr><td><i class="chip" style="background:#9E2A2B"></i>카에를레온</td><td>342</td><td>370</td><td>1,180</td><td class="dn">▼ 140</td><td><div class="ladder"><i class="bar d" style="width:36px"></i></div></td><td class="age">8분 전</td></tr>
+</table>
+</section>
+<aside class="coach">
+<div class="msg me">T5 광석 캐는 중인데 바로 팔까, 정제할까?</div>
+<div class="msg">지금은 테트포드에서 정제가 낫습니다. 보너스 도시라 리턴율 36.7%를 받아 개당 약 381은화가 남습니다. 포커스를 쓰면 약 590까지 올라갑니다.</div>
+<div class="input">질문을 입력하세요</div>
+</aside>
+</main></body></html>

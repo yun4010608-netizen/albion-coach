@@ -1,0 +1,587 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-20T10:03:59+00:00",
+  "title": "Design System: 알비온 코치",
+  "extensions": {
+    "colorMeta": {
+      "up": {
+        "role": "primary",
+        "displayName": "Gain Red",
+        "canonical": "oklch(62.1% 0.205 27.4)",
+        "tonalRamp": [
+          "#160605",
+          "#4a0707",
+          "#800209",
+          "#b80110",
+          "#e33c36",
+          "#fb766a",
+          "#feb3aa",
+          "#ffe9e6"
+        ]
+      },
+      "up-ink": {
+        "role": "primary",
+        "displayName": "Gain Red, Lifted",
+        "canonical": "oklch(70.8% 0.184 27.0)",
+        "tonalRamp": [
+          "#150705",
+          "#470d0b",
+          "#7e080d",
+          "#b21c1e",
+          "#db4841",
+          "#f47d71",
+          "#fdb4ab",
+          "#fee9e6"
+        ]
+      },
+      "down": {
+        "role": "secondary",
+        "displayName": "Loss Blue",
+        "canonical": "oklch(60.0% 0.181 260.6)",
+        "tonalRamp": [
+          "#050b17",
+          "#0a234e",
+          "#0a3b8d",
+          "#1959c5",
+          "#3d7dec",
+          "#70a4fe",
+          "#accafe",
+          "#e6efff"
+        ]
+      },
+      "down-ink": {
+        "role": "secondary",
+        "displayName": "Loss Blue, Lifted",
+        "canonical": "oklch(73.1% 0.138 263.4)",
+        "tonalRamp": [
+          "#070b14",
+          "#142445",
+          "#213e7c",
+          "#365daf",
+          "#567fd5",
+          "#80a4eb",
+          "#b3caf5",
+          "#e7effd"
+        ]
+      },
+      "amber": {
+        "role": "tertiary",
+        "displayName": "Refresh Amber",
+        "canonical": "oklch(80.6% 0.147 79.0)",
+        "tonalRamp": [
+          "#100a03",
+          "#332101",
+          "#583c00",
+          "#805904",
+          "#aa7804",
+          "#cd9c45",
+          "#e2c496",
+          "#f7edde"
+        ]
+      },
+      "ground": {
+        "role": "neutral",
+        "displayName": "Night Graphite",
+        "canonical": "oklch(20.9% 0.010 268.2)",
+        "tonalRamp": [
+          "#0b0b0c",
+          "#242527",
+          "#404247",
+          "#5f6167",
+          "#808289",
+          "#a3a5aa",
+          "#c8c9cc",
+          "#eeeeef"
+        ]
+      },
+      "raise": {
+        "role": "neutral",
+        "displayName": "Raised Graphite",
+        "canonical": "oklch(24.3% 0.012 264.3)",
+        "tonalRamp": [
+          "#0b0b0c",
+          "#242528",
+          "#3f4247",
+          "#5e6168",
+          "#7f828a",
+          "#a2a5ab",
+          "#c7c9cd",
+          "#eeeef0"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Numeral White",
+        "canonical": "oklch(93.2% 0.013 86.8)",
+        "tonalRamp": [
+          "#0b0b0a",
+          "#262522",
+          "#44423c",
+          "#646159",
+          "#86827a",
+          "#a8a59e",
+          "#cbc9c5",
+          "#efeeed"
+        ],
+        "note": "Also the focus ring colour: the build declares --focus as an alias with the same value."
+      },
+      "mute": {
+        "role": "neutral",
+        "displayName": "Ledger Grey",
+        "canonical": "oklch(69.6% 0.012 269.5)",
+        "tonalRamp": [
+          "#0b0b0c",
+          "#242528",
+          "#404247",
+          "#5e6168",
+          "#7f828a",
+          "#a2a5ab",
+          "#c7c9cd",
+          "#eeeef0"
+        ]
+      },
+      "rule": {
+        "role": "neutral",
+        "displayName": "Hairline Graphite",
+        "canonical": "oklch(30.9% 0.015 264.3)",
+        "tonalRamp": [
+          "#0b0b0c",
+          "#232529",
+          "#3f4249",
+          "#5d616a",
+          "#7e828c",
+          "#a1a5ad",
+          "#c7c9ce",
+          "#eeeef0"
+        ]
+      },
+      "edge": {
+        "role": "neutral",
+        "displayName": "Control Edge",
+        "canonical": "oklch(54.1% 0.015 266.6)",
+        "tonalRamp": [
+          "#0b0b0c",
+          "#232529",
+          "#3f4249",
+          "#5d616a",
+          "#7e828c",
+          "#a1a5ad",
+          "#c7c9ce",
+          "#eeeef0"
+        ]
+      },
+      "city-thetford": {
+        "role": "city-tincture",
+        "displayName": "Thetford Purpure",
+        "canonical": "oklch(45.7% 0.130 307.8)",
+        "tonalRamp": [
+          "#0d0912",
+          "#2d1c3c",
+          "#51306c",
+          "#764999",
+          "#986bbe",
+          "#b793d8",
+          "#d4bfe9",
+          "#f2ebf9"
+        ]
+      },
+      "city-martlock": {
+        "role": "city-tincture",
+        "displayName": "Martlock Azure",
+        "canonical": "oklch(47.3% 0.124 258.7)",
+        "tonalRamp": [
+          "#070b13",
+          "#122541",
+          "#1e4176",
+          "#3260a6",
+          "#5282cc",
+          "#7ea6e4",
+          "#b2cbf0",
+          "#e7effb"
+        ]
+      },
+      "city-lymhurst": {
+        "role": "city-tincture",
+        "displayName": "Lymhurst Vert",
+        "canonical": "oklch(53.1% 0.119 142.6)",
+        "tonalRamp": [
+          "#070d07",
+          "#132c11",
+          "#1e4e1b",
+          "#33722f",
+          "#559450",
+          "#81b57d",
+          "#b5d3b1",
+          "#e8f2e7"
+        ]
+      },
+      "city-bridgewatch": {
+        "role": "city-tincture",
+        "displayName": "Bridgewatch Or",
+        "canonical": "oklch(70.0% 0.145 67.4)",
+        "tonalRamp": [
+          "#110903",
+          "#371f01",
+          "#5f3801",
+          "#895303",
+          "#b67001",
+          "#d6964e",
+          "#e8c199",
+          "#f9ecdf"
+        ]
+      },
+      "city-fort-sterling": {
+        "role": "city-tincture",
+        "displayName": "Fort Sterling Argent",
+        "canonical": "oklch(92.4% 0.007 106.5)",
+        "tonalRamp": [
+          "#0b0b0b",
+          "#252523",
+          "#42423f",
+          "#61615d",
+          "#83837e",
+          "#a5a5a1",
+          "#c9c9c7",
+          "#eeeeee"
+        ]
+      },
+      "city-caerleon": {
+        "role": "city-tincture",
+        "displayName": "Caerleon Gules",
+        "canonical": "oklch(46.8% 0.152 24.9)",
+        "tonalRamp": [
+          "#140707",
+          "#421312",
+          "#761d1e",
+          "#a63232",
+          "#ce5752",
+          "#e8857e",
+          "#f5b7b2",
+          "#fee9e7"
+        ]
+      },
+      "city-brecilien": {
+        "role": "city-tincture",
+        "displayName": "Brecilien Teal",
+        "canonical": "oklch(59.0% 0.079 195.2)",
+        "tonalRamp": [
+          "#060d0d",
+          "#0a2b2b",
+          "#034c4d",
+          "#146f6f",
+          "#409191",
+          "#74b2b1",
+          "#aed1d1",
+          "#e6f1f1"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Profit figure inline in the answer sentence only.",
+        "fluid": "clamp(40px, 5vw, 56px)"
+      },
+      "display-phone": {
+        "displayName": "Display Phone",
+        "purpose": "Floor of the fluid display figure, reached below about 800px viewport width."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "The answer sentence and its loading, empty and error forms.",
+        "fluid": "clamp(22px, 2.6vw, 30px)",
+        "textWrap": "balance"
+      },
+      "headline-phone": {
+        "displayName": "Headline Phone",
+        "purpose": "Floor of the fluid answer sentence, reached below about 850px viewport width."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "App name in the top bar."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Controls, tabs, ladder text, route line, starter prompts; 72ch measure for prose."
+      },
+      "body-long": {
+        "displayName": "Body Long",
+        "purpose": "Coach chat messages, 65ch measure."
+      },
+      "numeric": {
+        "displayName": "Numeric",
+        "purpose": "Price cells; the signed profit cell is weight 600, the best city name 700."
+      },
+      "meta": {
+        "displayName": "Meta",
+        "purpose": "Server label, filter field labels, data age column."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Ladder column heads; 12px also carries the detail sub-line, bonus tag and source note."
+      }
+    },
+    "shadows": [
+      {
+        "name": "tab-indicator",
+        "value": "inset 0 -2px #ece8df",
+        "purpose": "Selected tab underline. Structural state mark, not elevation; the system has no elevation shadows."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-out-expo",
+        "value": "cubic-bezier(.16, 1, .3, 1)",
+        "purpose": "The only easing curve; used by bar growth and the refresh tick."
+      },
+      {
+        "name": "bar-grow",
+        "value": "width 0.7s cubic-bezier(.16, 1, .3, 1)",
+        "purpose": "Profit bars grow from the centre axis when the recipe changes (not on a plain refresh)."
+      },
+      {
+        "name": "fresh-tick",
+        "value": "background color-mix(in srgb, var(--amber) 22%, transparent) to transparent over 2.4s, cubic-bezier(.16, 1, .3, 1)",
+        "purpose": "Amber wash on a price cell whose value changed since the last load of the same recipe."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "prefers-reduced-motion: reduce removes bar-grow and fresh-tick",
+        "purpose": "Values still update; nothing animates."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "two-pane",
+        "value": "1100px",
+        "purpose": "At 1100px and wider, calculator and coach sit side by side and the tabs are hidden."
+      },
+      {
+        "name": "phone",
+        "value": "760px",
+        "purpose": "At 760px and narrower: 16px gutters, 40px bars, price and age columns fold into the detail sub-line, 44px minimum height for selects, inputs, ghost buttons, checkbox rows and starter prompts."
+      }
+    ],
+    "sizes": [
+      {
+        "name": "top-bar",
+        "value": "56px"
+      },
+      {
+        "name": "coach-pane",
+        "value": "440px"
+      },
+      {
+        "name": "bar-max",
+        "value": "120px per side (40px at 760px and below)"
+      },
+      {
+        "name": "bar-height",
+        "value": "12px"
+      },
+      {
+        "name": "axis-overhang",
+        "value": "7px above and below the bar track"
+      },
+      {
+        "name": "city-chip",
+        "value": "9px"
+      },
+      {
+        "name": "answer-min-height",
+        "value": "112px"
+      },
+      {
+        "name": "touch-min",
+        "value": "44px at 760px and below"
+      },
+      {
+        "name": "measure-prose",
+        "value": "72ch"
+      },
+      {
+        "name": "measure-chat",
+        "value": "65ch"
+      }
+    ],
+    "browserSurfaces": {
+      "selection": "Night Graphite text on Numeral White",
+      "caret": "Numeral White",
+      "focus": "1px solid Numeral White outline, 2px offset (-3px inset on segment options)",
+      "placeholder": "Ledger Grey",
+      "scrollbar": "thin, Hairline Graphite thumb on a transparent track",
+      "links": "Numeral White text, Ledger Grey underline at 3px offset",
+      "colorScheme": "dark; theme-color #16181D"
+    }
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The one filled action (보내기); Numeral White fill, half opacity when disabled.",
+      "html": "<div class=\"ds-pb-wrap\"><button class=\"ds-btn-primary\">보내기</button> <button class=\"ds-btn-primary\" disabled>보내기</button></div>",
+      "css": ".ds-pb-wrap { background: var(--ground, #16181d); padding: 16px; display: flex; gap: 12px; font: 15px/1.55 \"Pretendard Variable\", system-ui, -apple-system, \"Apple SD Gothic Neo\", \"Noto Sans KR\", sans-serif; } .ds-btn-primary { background: var(--ink, #ece8df); color: var(--ground, #16181d); border: 0; border-radius: 2px; padding: 8px 18px; font: inherit; font-weight: 600; cursor: pointer; } .ds-btn-primary:focus-visible { outline: 1px solid var(--focus, #ece8df); outline-offset: 2px; } .ds-btn-primary:disabled { opacity: .5; cursor: default; }"
+    },
+    {
+      "name": "Ghost Button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Secondary actions (시세 새로고침, 대화 지우기): hairline border, grey text that lifts to white on hover.",
+      "html": "<div class=\"ds-gb-wrap\"><button class=\"ds-btn-ghost\">시세 새로고침</button> <button class=\"ds-btn-ghost\" disabled>시세 새로고침</button></div>",
+      "css": ".ds-gb-wrap { background: var(--ground, #16181d); padding: 16px; display: flex; gap: 12px; font: 15px/1.55 \"Pretendard Variable\", system-ui, -apple-system, \"Apple SD Gothic Neo\", \"Noto Sans KR\", sans-serif; } .ds-btn-ghost { background: none; border: 1px solid var(--edge, #6b6f78); border-radius: 2px; padding: 6px 12px; color: var(--mute, #9a9da5); font: inherit; cursor: pointer; } .ds-btn-ghost:hover:not(:disabled) { color: var(--ink, #ece8df); border-color: var(--ink, #ece8df); } .ds-btn-ghost:focus-visible { outline: 1px solid var(--focus, #ece8df); outline-offset: 2px; } .ds-btn-ghost:disabled { opacity: .45; cursor: default; }"
+    },
+    {
+      "name": "Resource Segmented Control",
+      "kind": "chip",
+      "refersTo": "segment",
+      "description": "Square radio strip with 1px dividers; the selected option inverts to Numeral White.",
+      "html": "<div class=\"ds-seg-wrap\"><fieldset class=\"ds-seg\" aria-label=\"자원\"><label><input type=\"radio\" name=\"ds-res\" checked><span>광석</span></label><label><input type=\"radio\" name=\"ds-res\"><span>목재</span></label><label><input type=\"radio\" name=\"ds-res\"><span>섬유</span></label><label><input type=\"radio\" name=\"ds-res\"><span>생가죽</span></label><label><input type=\"radio\" name=\"ds-res\"><span>돌</span></label></fieldset></div>",
+      "css": ".ds-seg-wrap { background: var(--ground, #16181d); padding: 16px; font: 15px/1.55 \"Pretendard Variable\", system-ui, -apple-system, \"Apple SD Gothic Neo\", \"Noto Sans KR\", sans-serif; } .ds-seg { display: inline-flex; border: 1px solid var(--edge, #6b6f78); margin: 0; padding: 0; } .ds-seg label { position: relative; } .ds-seg input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; } .ds-seg span { display: block; padding: 7px 13px; color: var(--mute, #9a9da5); } .ds-seg label + label span { border-left: 1px solid var(--edge, #6b6f78); } .ds-seg input:checked + span { background: var(--ink, #ece8df); color: var(--ground, #16181d); font-weight: 600; } .ds-seg input:focus-visible + span { outline: 1px solid var(--focus, #ece8df); outline-offset: -3px; }"
+    },
+    {
+      "name": "Filter Field",
+      "kind": "input",
+      "refersTo": "field",
+      "description": "Inline-labelled select and number input on Raised Graphite with 2px corners.",
+      "html": "<div class=\"ds-field-wrap\"><label class=\"ds-sel\">티어 <select><option>T4</option><option>T5</option></select></label><label class=\"ds-sel\">사용료 <input type=\"number\" value=\"0\"></label><label class=\"ds-chk\"><input type=\"checkbox\" checked><span>프리미엄</span></label></div>",
+      "css": ".ds-field-wrap { background: var(--ground, #16181d); padding: 16px; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; font: 15px/1.55 \"Pretendard Variable\", system-ui, -apple-system, \"Apple SD Gothic Neo\", \"Noto Sans KR\", sans-serif; color: var(--ink, #ece8df); } .ds-sel { display: flex; align-items: center; gap: 8px; color: var(--mute, #9a9da5); font-size: 13px; } .ds-sel select, .ds-sel input { background: var(--raise, #1d2026); border: 1px solid var(--edge, #6b6f78); border-radius: 2px; padding: 6px 8px; color: var(--ink, #ece8df); font: 15px/1.55 \"Pretendard Variable\", system-ui, -apple-system, \"Apple SD Gothic Neo\", \"Noto Sans KR\", sans-serif; } .ds-sel input { width: 7ch; } .ds-sel select:focus-visible, .ds-sel input:focus-visible { outline: 1px solid var(--focus, #ece8df); outline-offset: 2px; } .ds-chk { display: flex; align-items: center; gap: 6px; cursor: pointer; } .ds-chk input { accent-color: var(--ink, #ece8df); width: 15px; height: 15px; margin: 0; }"
+    },
+    {
+      "name": "Top Bar and Tabs",
+      "kind": "nav",
+      "refersTo": "top-bar",
+      "description": "56px bar: app name, full-height tabs with a 2px inset underline when selected, server label pushed right.",
+      "html": "<header class=\"ds-bar\"><span class=\"ds-brand\">알비온 코치</span><nav class=\"ds-tabs\" role=\"tablist\"><button role=\"tab\" aria-selected=\"true\">정제 계산기</button><button role=\"tab\" aria-selected=\"false\">코치</button></nav><span class=\"ds-server\">Asia 서버</span></header>",
+      "css": ".ds-bar { height: 56px; display: flex; align-items: center; gap: 28px; padding: 0 16px; background: var(--ground, #16181d); color: var(--ink, #ece8df); border-bottom: 1px solid var(--rule, #2c3038); font: 15px/1.55 \"Pretendard Variable\", system-ui, -apple-system, \"Apple SD Gothic Neo\", \"Noto Sans KR\", sans-serif; } .ds-brand { font-weight: 700; font-size: 17px; letter-spacing: -0.01em; } .ds-server { margin-left: auto; color: var(--mute, #9a9da5); font-size: 13px; } .ds-tabs { display: flex; gap: 2px; height: 100%; } .ds-tabs button { background: none; border: 0; padding: 0 12px; height: 100%; color: var(--mute, #9a9da5); font: inherit; cursor: pointer; } .ds-tabs button[aria-selected=\"true\"] { color: var(--ink, #ece8df); box-shadow: inset 0 -2px var(--ink, #ece8df); } .ds-tabs button:focus-visible { outline: 1px solid var(--focus, #ece8df); outline-offset: 2px; }"
+    },
+    {
+      "name": "Answer Sentence",
+      "kind": "custom",
+      "refersTo": "answer-figure-gain",
+      "description": "Signature: the decision as one Korean sentence with the profit figure inline at display size, evidence underneath in grey.",
+      "html": "<div class=\"ds-answer\"><h1>Thetford에서 정제하면 개당 <span class=\"ds-fig ds-up\"><svg class=\"ds-tri\" viewBox=\"0 0 10 9\" aria-hidden=\"true\"><path d=\"M5 0 10 9H0z\"/></svg>80</span> 은화</h1><p>T5 티타늄 광석 3개 + T4 강철 주괴 1개 → T5 티타늄 강철 주괴 · 리턴율 36.7% · 판매 수수료 6.5% · 제작소 사용료 빠짐 · 마진 8%</p></div>",
+      "css": ".ds-answer { background: var(--ground, #16181d); color: var(--ink, #ece8df); padding: 20px; border-bottom: 1px solid var(--rule, #2c3038); font: 15px/1.55 \"Pretendard Variable\", system-ui, -apple-system, \"Apple SD Gothic Neo\", \"Noto Sans KR\", sans-serif; font-variant-numeric: tabular-nums; word-break: keep-all; } .ds-answer h1 { margin: 0; font-size: clamp(22px, 2.6vw, 30px); font-weight: 600; letter-spacing: -0.015em; line-height: 1.35; text-wrap: balance; } .ds-fig { font-size: clamp(40px, 5vw, 56px); font-weight: 700; letter-spacing: -0.03em; white-space: nowrap; } .ds-up { color: var(--up-ink, #ff6a5f); } .ds-answer p { margin: 8px 0 0; color: var(--mute, #9a9da5); max-width: 72ch; } .ds-tri { width: .6em; height: .55em; fill: currentColor; vertical-align: .08em; margin-right: .12em; }"
+    },
+    {
+      "name": "City Ladder",
+      "kind": "custom",
+      "refersTo": "ladder-cell",
+      "description": "Signature: ranked city rows with fixed furniture and profit bars growing from a shared 1px centre axis; changed prices tick amber.",
+      "html": "<div class=\"ds-ladder-wrap\"><table class=\"ds-ladder\"><thead><tr><th>도시</th><th>정제품</th><th>개당 손익</th><th><span class=\"ds-sr\">손익 막대</span></th><th>갱신</th></tr></thead><tbody><tr class=\"ds-best\"><td><div class=\"ds-city\"><i class=\"ds-chip\" style=\"background:#6b3f8e\"></i>Thetford<span class=\"ds-tag\">정제 보너스</span></div></td><td class=\"ds-fresh\">1,189</td><td class=\"ds-pl\"><span class=\"ds-up\"><svg class=\"ds-tri\" viewBox=\"0 0 10 9\" aria-hidden=\"true\"><path d=\"M5 0 10 9H0z\"/></svg>80</span></td><td class=\"ds-axis\"><div class=\"ds-track\"><i class=\"ds-fill ds-gain\" style=\"--w:120px\"></i></div></td><td class=\"ds-age\">20시간 전</td></tr><tr><td><div class=\"ds-city\"><i class=\"ds-chip\" style=\"background:#2c5aa0\"></i>Martlock</div></td><td>1,154</td><td class=\"ds-pl\"><span class=\"ds-down\"><svg class=\"ds-tri\" viewBox=\"0 0 10 9\" aria-hidden=\"true\"><path d=\"M0 0h10L5 9z\"/></svg>35</span></td><td class=\"ds-axis\"><div class=\"ds-track\"><i class=\"ds-fill ds-loss\" style=\"--w:52px\"></i></div></td><td class=\"ds-age\">10시간 전</td></tr><tr class=\"ds-missing\"><td><div class=\"ds-city\"><i class=\"ds-chip\" style=\"background:#3e7d3a\"></i>Lymhurst</div></td><td>—</td><td class=\"ds-pl\">데이터 없음</td><td class=\"ds-axis\"><div class=\"ds-track\"></div></td><td class=\"ds-age\">없음</td></tr></tbody></table></div>",
+      "css": ".ds-ladder-wrap { background: var(--ground, #16181d); color: var(--ink, #ece8df); padding: 8px 20px; font: 15px/1.55 \"Pretendard Variable\", system-ui, -apple-system, \"Apple SD Gothic Neo\", \"Noto Sans KR\", sans-serif; } .ds-ladder { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; } .ds-ladder th { font-size: 12px; font-weight: 500; color: var(--mute, #9a9da5); text-align: right; padding: 12px 10px; border-bottom: 1px solid var(--rule, #2c3038); } .ds-ladder td { padding: 13px 10px; border-bottom: 1px solid var(--rule, #2c3038); text-align: right; white-space: nowrap; } .ds-ladder th:first-child, .ds-ladder td:first-child { text-align: left; padding-left: 0; } .ds-city { display: flex; align-items: baseline; gap: 8px; } .ds-chip { width: 9px; height: 9px; flex: none; align-self: center; } .ds-tag { font-size: 12px; color: var(--mute, #9a9da5); font-weight: 600; } .ds-pl { font-weight: 600; min-width: 7ch; } .ds-up { color: var(--up-ink, #ff6a5f); } .ds-down { color: var(--down-ink, #7aa6ff); } .ds-best td:first-child { font-weight: 700; } .ds-missing td { color: var(--mute, #9a9da5); } .ds-missing .ds-pl { font-weight: 400; } .ds-age { color: var(--mute, #9a9da5); font-size: 13px; } .ds-axis { width: 241px; padding-left: 16px; padding-right: 16px; } .ds-track { position: relative; height: 12px; width: 241px; } .ds-track::before { content: \"\"; position: absolute; left: 120px; top: -7px; bottom: -7px; border-left: 1px solid var(--mute, #9a9da5); } .ds-fill { position: absolute; top: 0; height: 12px; width: var(--w, 0px); transition: width .7s cubic-bezier(.16, 1, .3, 1); } .ds-gain { left: 121px; background: var(--up, #e8413a); } .ds-loss { right: 121px; background: var(--down, #3b7bea); } .ds-fresh { animation: ds-tick 2.4s cubic-bezier(.16, 1, .3, 1); } @keyframes ds-tick { from { background: color-mix(in srgb, var(--amber, #f2b33d) 22%, transparent); } to { background: transparent; } } @media (prefers-reduced-motion: reduce) { .ds-fill { transition: none; } .ds-fresh { animation: none; } } .ds-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; } .ds-tri { width: .6em; height: .55em; fill: currentColor; vertical-align: .08em; margin-right: .12em; }"
+    },
+    {
+      "name": "Starter Prompt",
+      "kind": "chip",
+      "refersTo": "starter-prompt",
+      "description": "Outlined question buttons shown while the coach thread is empty.",
+      "html": "<div class=\"ds-st-wrap\"><p class=\"ds-st-lead\">무엇이든 물어보세요. 시세와 공개 캐릭터 명성을 확인해서 답합니다.</p><button class=\"ds-starter\">첫날 뭐부터 해야 해?</button><button class=\"ds-starter\">T4 광석 지금 정제하면 이득이야?</button></div>",
+      "css": ".ds-st-wrap { background: var(--ground, #16181d); padding: 20px 24px; display: flex; flex-direction: column; align-items: flex-start; gap: 8px; font: 15px/1.55 \"Pretendard Variable\", system-ui, -apple-system, \"Apple SD Gothic Neo\", \"Noto Sans KR\", sans-serif; word-break: keep-all; } .ds-st-lead { margin: 0 0 6px; color: var(--mute, #9a9da5); max-width: 40ch; } .ds-starter { background: none; border: 1px solid var(--edge, #6b6f78); border-radius: 2px; padding: 8px 12px; text-align: left; color: var(--ink, #ece8df); font: inherit; cursor: pointer; } .ds-starter:hover:not(:disabled) { border-color: var(--ink, #ece8df); } .ds-starter:focus-visible { outline: 1px solid var(--focus, #ece8df); outline-offset: 2px; } .ds-starter:disabled { color: var(--mute, #9a9da5); cursor: default; }"
+    },
+    {
+      "name": "Coach Thread and Ask Field",
+      "kind": "input",
+      "refersTo": "field-ask",
+      "description": "Player bubble on Raised Graphite, unboxed coach reply, the white-ruled error line, and the pinned ask form with its textarea.",
+      "html": "<div class=\"ds-coach\"><ol class=\"ds-log\"><li class=\"ds-me\">T4 광석 지금 정제하면 이득이야?</li><li class=\"ds-bot\"><p>지금은 <strong>Thetford</strong>에서 정제하면 개당 약 80 은화 이득입니다.</p></li><li class=\"ds-err\">답을 받지 못했습니다: HTTP 502. 질문은 입력칸에 그대로 두었으니 다시 보내 보세요.</li></ol><form class=\"ds-ask\"><textarea rows=\"2\" placeholder=\"예: 내 캐릭터 이름은 ○○○, 다음 목표 추천해줘\"></textarea></form></div>",
+      "css": ".ds-coach { background: var(--ground, #16181d); color: var(--ink, #ece8df); font: 15px/1.55 \"Pretendard Variable\", system-ui, -apple-system, \"Apple SD Gothic Neo\", \"Noto Sans KR\", sans-serif; word-break: keep-all; } .ds-log { list-style: none; margin: 0; padding: 20px 24px 8px; display: flex; flex-direction: column; gap: 16px; } .ds-log li { max-width: 65ch; line-height: 1.65; } .ds-me { align-self: flex-end; background: var(--raise, #1d2026); padding: 10px 14px; border-radius: 2px; white-space: pre-wrap; } .ds-bot p { margin: 0 0 8px; } .ds-bot strong { font-weight: 700; } .ds-ask { border-top: 1px solid var(--rule, #2c3038); padding: 14px 24px; } .ds-ask textarea { width: 100%; box-sizing: border-box; resize: none; background: var(--raise, #1d2026); border: 1px solid var(--edge, #6b6f78); border-radius: 2px; padding: 10px 12px; color: var(--ink, #ece8df); font: inherit; } .ds-ask textarea::placeholder { color: var(--mute, #9a9da5); } .ds-err { color: var(--ink, #ece8df); border-top: 1px solid var(--ink, #ece8df); padding-top: 8px; } .ds-ask textarea:focus-visible { outline: 1px solid var(--focus, #ece8df); outline-offset: 2px; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Night Quote Board",
+    "overview": "The tool sits on a second screen beside a dark, busy game and reads like a Korean brokerage quote screen (시세판). One graphite ground, numerals in warm white, and two market colours used the Korean way: red for gain, blue for loss. Cities stand in a ranked ladder, and each row's profit is drawn as a bar growing left or right from a hairline centre axis. The board is dense but calm. Nothing is boxed, nothing floats, and a refresh changes digits without moving the layout.\n\nHierarchy comes from one sentence. Each view opens with a Korean sentence that names the decision, with the profit figure set at display size inside it, and the evidence (recipe, return rate, fees, data age) follows in muted text underneath. Below that, the ladder gives the alternatives, and the coach pane takes follow-up questions in Korean. Colour is held back so that the gain/loss pair always reads as data and never as decoration.\n\nThe world rejects the category defaults of game-tool UIs: grey panels, a gold accent, card chrome and a plain sortable table. It uses no game logo or official art.",
+    "keyCharacteristics": [
+      "Graphite night ground, warm numeral white, the Korean red-up / blue-down market convention.",
+      "1px lines carry all structure (dim hairlines divide, a brighter edge outlines controls); no cards, no elevation shadows.",
+      "A single variable typeface (Pretendard Variable) with tabular numerals everywhere numbers appear.",
+      "An answer sentence with an embedded display-size figure leads every result.",
+      "A centre-axis profit ladder with fixed furniture in every row: tincture chip, name, prices, signed profit, bar, data age.",
+      "Amber appears only for the moment a price changes."
+    ],
+    "rules": [
+      {
+        "name": "The Market Convention Rule",
+        "body": "Gain Red means profit and Loss Blue means loss, as on a Korean brokerage screen, and they mean nothing else. Each always arrives with its drawn triangle (▲ gain, ▼ loss); zero stays in Numeral White with no triangle. Errors speak in Numeral White, text and rule alike.",
+        "section": "colors"
+      },
+      {
+        "name": "The Lifted Ink Rule",
+        "body": "Bars take the fill pair; numbers and words take the lifted inks. Never set text in the fill red or fill blue.",
+        "section": "colors"
+      },
+      {
+        "name": "The Edge-Or-Rule Rule",
+        "body": "A line that separates content is Hairline Graphite; a line that outlines something the player can press or type into is Control Edge. Never swap them.",
+        "section": "colors"
+      },
+      {
+        "name": "The Fresh Amber Rule",
+        "body": "Amber exists only in motion: a 22% mix of Refresh Amber washed behind a value that just changed, fading out over 2.4s. If amber is visible on a screen at rest, it is a bug.",
+        "section": "colors"
+      },
+      {
+        "name": "The Tincture Chip Rule",
+        "body": "A city tincture lives only in the 9px chip and always sits next to the city name. It is never a text colour, bar colour or row background, and it never identifies a city on its own (Thetford, Martlock and Caerleon sit below 3:1 on the ground).",
+        "section": "colors"
+      },
+      {
+        "name": "The Fixed-Digit Rule",
+        "body": "Every number in the ladder and the answer uses tabular numerals, and numeric columns hold minimum widths (7ch for profit, 8ch for prices), so a refresh changes digits and never shifts a column.",
+        "section": "typography"
+      },
+      {
+        "name": "The One Family Rule",
+        "body": "Pretendard Variable is the only face. No monospace for numbers, no display face for headings; weight and size do the work.",
+        "section": "typography"
+      },
+      {
+        "name": "The Whole-Word Rule",
+        "body": "Korean text breaks between words, never inside one (keep-all), with anywhere-wrapping only as an overflow escape for long English item names.",
+        "section": "typography"
+      },
+      {
+        "name": "The Flat Board Rule",
+        "body": "Surfaces never lift. If something needs separating, give it a 1px rule or move it onto Raised Graphite; never a shadow, glow or blur.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Two-Pixel Ceiling Rule",
+        "body": "Corners are 0px or 2px. Chips, bars and the segmented control stay square; a radius above 2px does not belong in this world.",
+        "section": "shapes"
+      },
+      {
+        "name": "The Fixed Furniture Rule",
+        "body": "Every city row carries the same parts in the same slots, and data age is always on the row (its own column on wide screens, the end of the detail sub-line on phone). A price is never shown without its age.",
+        "section": "components"
+      },
+      {
+        "name": "The Axis Rule",
+        "body": "Profit is drawn from one shared 1px centre axis: gain right in red, loss left in blue, never stacked, never from the left edge.",
+        "section": "components"
+      }
+    ],
+    "dos": [
+      "**Do** lead every result with one Korean sentence that names the answer, the figure inline at Display scale with its drawn triangle.",
+      "**Do** pair every signed number with the authored SVG triangle (▲ gain, ▼ loss) and its Lifted Ink colour; leave zero in Numeral White with no triangle.",
+      "**Do** set every number in tabular numerals and hold numeric column widths so a refresh changes digits, never layout.",
+      "**Do** show data age next to every price, in the same slot on every row.",
+      "**Do** draw every divider, border, axis and focus outline at 1px; keep the selected tab's 2px underline as the only heavier line.",
+      "**Do** outline controls in Control Edge and divide content with Hairline Graphite; hover lifts a control's border to Numeral White.",
+      "**Do** show a missing value as an em dash or 데이터 없음 in Ledger Grey, never as zero.",
+      "**Do** theme the browser surfaces from the palette: selection inverts to Night Graphite on Numeral White, caret and focus ring in Numeral White, thin scrollbars in Hairline Graphite, link underlines in Ledger Grey at a 3px offset.",
+      "**Do** give every phone control at least 44px of height at 760px and below.",
+      "**Do** remove the bar growth and the amber tick under prefers-reduced-motion."
+    ],
+    "donts": [
+      "**Don't** use the market red or blue for anything except gain and loss; errors speak in Numeral White.",
+      "**Don't** leave amber on screen at rest; it exists only as the fading wash on a value that just changed.",
+      "**Don't** wrap content in cards, panels or drop shadows; panes are separated by 1px rules on one graphite ground.",
+      "**Don't** round anything beyond 2px, and keep chips, bars and the segmented control square.",
+      "**Don't** add a second typeface or a monospace; hierarchy comes from Pretendard Variable's size and weight steps.",
+      "**Don't** label anything twice: a city is named once per row, and the bar column's header exists only for screen readers.",
+      "**Don't** use a city tincture as a text colour, bar colour or row background.",
+      "**Don't** use Albion Online's logo or official art."
+    ]
+  }
+}
