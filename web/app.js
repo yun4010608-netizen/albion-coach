@@ -227,9 +227,12 @@ const store = {
 };
 let chat = store.get();
 
-// Minimal markdown: escape first, then only add our own tags (bold, lists, paragraphs).
+// Minimal markdown: escape first, then only add our own tags (bold, http(s) links, lists, paragraphs).
 function md(src) {
-  const lines = esc(src).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').split('\n');
+  const lines = esc(src)
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\[([^\]\n]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>')
+    .split('\n');
   let html = '';
   let list = null;
   let para = [];

@@ -3,7 +3,7 @@
 알비온 온라인 Asia 서버용 보조 도구입니다. 게임 옆 화면(보조 모니터나 휴대폰)에 띄워 두고 씁니다.
 
 - **정제 계산기**: Asia 서버 실시간 시세로 도시별 정제 손익, 리턴율, 운반 경로를 보여 줍니다. API 키 없이 동작합니다.
-- **코치**: 한국어로 묻고 답합니다. 조사한 초반 가이드(`knowledge/guide.md`), 실시간 시세, 공개 캐릭터 명성을 도구로 확인해서 답합니다. `ANTHROPIC_API_KEY`가 필요합니다.
+- **코치**: 한국어로 묻고 답합니다. 조사한 초반 가이드(`knowledge/guide.md`), 실시간 시세, 공개 캐릭터 명성을 도구로 확인하고, 가이드에 없는 내용은 웹에서 찾아 출처와 함께 답합니다. `ANTHROPIC_API_KEY`가 필요합니다.
 
 게임 클라이언트에 입력을 보내거나 게임 메모리·패킷을 읽지 않습니다. 쓰는 데이터는 모두 공개 API입니다.
 
@@ -48,6 +48,7 @@ go test ./...
 | 서버 | Go 1.27.4 | Node/TypeScript, Python FastAPI | 단일 정적 바이너리라 scratch 이미지로 충분하고, graceful shutdown이 표준 라이브러리에 있음. 1.27.4는 2026-11-10 보안 릴리스(CVE 12건) | BSD-3-Clause |
 | Claude 연동 | anthropic-sdk-go v2.12.0 (tool runner) | 직접 HTTP 호출, TypeScript SDK | 공식 SDK, 도구 호출 루프 내장 | MIT |
 | 모델 | `claude-sonnet-5-5` (effort medium, server-side fallback) | `claude-opus-5-5` | 사용자 선택(2026-11-20): 코치 대화에 충분하고 더 저렴함. `.env`의 `CLAUDE_MODEL`로 바꿀 수 있음 | 상용 API |
+| 웹 검색 | Claude 서버 측 `web_search_20250305` (API 호출마다 최대 5회) | `web_search_20260209`(동적 필터링), Brave Search API, Tavily | 키·코드를 더 두지 않고 API 안에서 검색하고, 답에 출처(citation)가 붙어 옴. `20260209`는 결과를 코드로 거르면서 출처가 빠져 나와 제외(2026-11-20 확인). 검색 1,000건당 $10 추가 | 상용 API |
 | 시세 | Albion Online Data Project API (`east.` = Asia) | 게임 패킷 직접 수집, 시세 사이트 스크래핑 | 플레이어가 자발적으로 공유한 무료 데이터로, 개발사가 허용(2025-01-02 커뮤니티 매니저) | 무료 공개 API |
 | 캐릭터 명성 | 공식 gameinfo API (`gameinfo-sgp`) | 없음 | 공식 공개 데이터. CORS가 없어 서버가 대신 호출 | 공개 API |
 | 아이템 한국어명 | ao-bin-dumps에서 추출한 `names.json` | 직접 번역 | 게임 공식 현지화와 일치 | 게임 데이터 © Sandbox Interactive |

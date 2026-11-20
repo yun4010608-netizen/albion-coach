@@ -2,12 +2,15 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"math"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/anthropics/anthropic-sdk-go/v2"
 )
 
 func TestRecipe(t *testing.T) {
@@ -145,5 +148,26 @@ func TestValidateChat(t *testing.T) {
 		if validateChat(bad) == nil {
 			t.Errorf("%v should fail", bad)
 		}
+	}
+}
+
+func TestSources(t *testing.T) {
+	var msg anthropic.BetaMessage
+	raw := `{"content":[
+		{"type":"server_tool_use","id":"s1","name":"web_search","input":{"query":"albion island"}},
+		{"type":"text","text":"섬은 ","citations":[
+			{"type":"web_search_result_location","url":"https://wiki.albiononline.com/wiki/Island","title":"Island [Wiki]","encrypted_index":"x","cited_text":"a"},
+			{"type":"web_search_result_location","url":"https://wiki.albiononline.com/wiki/Island","title":"dup","encrypted_index":"x","cited_text":"a"}]},
+		{"type":"text","text":"프리미엄이 필요합니다.","citations":[
+			{"type":"web_search_result_location","url":"https://example.com/a_(b)","title":"","encrypted_index":"x","cited_text":"b"}]}]}`
+	if err := json.Unmarshal([]byte(raw), &msg); err != nil {
+		t.Fatal(err)
+	}
+	want := "\n\n출처:\n- [Island (Wiki)](https://wiki.albiononline.com/wiki/Island)\n- [https://example.com/a_(b)](https://example.com/a_(b%29)"
+	if got := sources(msg.Content); got != want {
+		t.Errorf("sources = %q, want %q", got, want)
+	}
+	if got := sources(nil); got != "" {
+		t.Errorf("no citations should add nothing, got %q", got)
 	}
 }
