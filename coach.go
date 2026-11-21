@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"unicode/utf8"
 
 	"github.com/anthropics/anthropic-sdk-go/v2"
 	"github.com/anthropics/anthropic-sdk-go/v2/toolrunner"
@@ -15,6 +16,9 @@ type ChatMsg struct {
 	Role    string `json:"role"`
 	Content string `json:"content"`
 }
+
+// maxChat and maxChars bound one request; the browser sends only its newest messages (web/app.js).
+const maxChat, maxChars = 40, 8000
 
 const coachRules = `너는 알비온 온라인 Asia 서버를 막 시작한 플레이어의 한국어 코치다. 사용자는 게임 옆 화면(보조 모니터나 휴대폰)으로 너를 본다.
 
@@ -100,15 +104,15 @@ func NewCoach(client anthropic.Client, model, guide string, app *App) (*Coach, e
 var errBadChat = errors.New("bad chat history")
 
 func validateChat(msgs []ChatMsg) error {
-	if len(msgs) == 0 || len(msgs) > 40 {
-		return fmt.Errorf("%w: 1-40 messages", errBadChat)
+	if len(msgs) == 0 || len(msgs) > maxChat {
+		return fmt.Errorf("%w: 1-%d messages", errBadChat, maxChat)
 	}
 	for i, m := range msgs {
 		want := "user"
 		if i%2 == 1 {
 			want = "assistant"
 		}
-		if m.Role != want || strings.TrimSpace(m.Content) == "" || len(m.Content) > 8000 {
+		if m.Role != want || strings.TrimSpace(m.Content) == "" || utf8.RuneCountInString(m.Content) > maxChars {
 			return fmt.Errorf("%w: message %d", errBadChat, i)
 		}
 	}
@@ -129,6 +133,7 @@ func (c *Coach) Reply(ctx context.Context, msgs []ChatMsg) (string, error) {
 		if m.Role == "user" {
 			history = append(history, anthropic.NewBetaUserMessage(block))
 		} else {
+			block = anthropic.NewBetaTextBlock(withoutSources(m.Content))
 			history = append(history, anthropic.BetaMessageParam{OfAssistant: &anthropic.BetaAssistantMessageParam{Content: []anthropic.BetaContentBlockParamUnion{block}}})
 		}
 	}
@@ -178,6 +183,16 @@ func (c *Coach) Reply(ctx context.Context, msgs []ChatMsg) (string, error) {
 
 const maxSources = 5
 
+const sourcesHeader = "\n\n출처:\n- ["
+
+// withoutSources drops the list sources() appended, so the model does not copy it into new answers.
+func withoutSources(s string) string {
+	if i := strings.LastIndex(s, sourcesHeader); i > 0 {
+		return s[:i]
+	}
+	return s
+}
+
 // sources lists the web pages the answer cites, once each, as markdown links; search results shown to users must carry their sources.
 func sources(content []anthropic.BetaContentBlockUnion) string {
 	var b strings.Builder
@@ -202,5 +217,5 @@ func sources(content []anthropic.BetaContentBlockUnion) string {
 	if b.Len() == 0 {
 		return ""
 	}
-	return "\n\n출처:" + b.String()
+	return "\n\n출처:" + b.String() // starts with sourcesHeader
 }

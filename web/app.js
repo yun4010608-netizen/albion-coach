@@ -275,8 +275,9 @@ async function ask(text) {
   chat = msgs;
   drawLog('<li class="wait">시세와 가이드를 확인하는 중…</li>');
   try {
+    // The server takes at most 40 messages; an odd-sized tail still starts with a question.
     const r = await fetch('/api/chat', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ messages: msgs }),
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ messages: msgs.slice(-39) }),
     });
     const data = await r.json().catch(() => ({}));
     if (!r.ok) throw new Error(data.error || `HTTP ${r.status}`);

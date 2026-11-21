@@ -128,7 +128,7 @@ func (a *App) routes() http.Handler {
 		var body struct {
 			Messages []ChatMsg `json:"messages"`
 		}
-		if err := json.NewDecoder(http.MaxBytesReader(w, r.Body, 512<<10)).Decode(&body); err != nil {
+		if err := json.NewDecoder(http.MaxBytesReader(w, r.Body, 2<<20)).Decode(&body); err != nil {
 			fail(w, http.StatusBadRequest, "요청 형식이 잘못되었습니다")
 			return
 		}

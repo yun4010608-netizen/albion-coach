@@ -144,7 +144,11 @@ func TestValidateChat(t *testing.T) {
 	if err := validateChat(ok); err != nil {
 		t.Fatal(err)
 	}
-	for _, bad := range [][]ChatMsg{nil, {{"assistant", "x"}}, {{"user", "a"}, {"assistant", "b"}}, {{"user", " "}}, {{"system", "x"}}} {
+	// 8000 Korean characters are 24,000 bytes; the limit counts characters.
+	if err := validateChat([]ChatMsg{{"user", strings.Repeat("섬", 8000)}}); err != nil {
+		t.Fatal(err)
+	}
+	for _, bad := range [][]ChatMsg{nil, {{"assistant", "x"}}, {{"user", "a"}, {"assistant", "b"}}, {{"user", " "}}, {{"system", "x"}}, {{"user", strings.Repeat("섬", 8001)}}} {
 		if validateChat(bad) == nil {
 			t.Errorf("%v should fail", bad)
 		}
@@ -169,5 +173,11 @@ func TestSources(t *testing.T) {
 	}
 	if got := sources(nil); got != "" {
 		t.Errorf("no citations should add nothing, got %q", got)
+	}
+	if got := withoutSources("답입니다." + want); got != "답입니다." {
+		t.Errorf("withoutSources = %q", got)
+	}
+	if got := withoutSources("출처가 없는 답"); got != "출처가 없는 답" {
+		t.Errorf("withoutSources changed a plain answer: %q", got)
 	}
 }
