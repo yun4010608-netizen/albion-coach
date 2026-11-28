@@ -26,6 +26,17 @@ type TradeOption struct {
 	Trip     float64   `json:"trip"`
 	Need     int       `json:"need"` // silver to buy the load
 	Updated  time.Time `json:"updated"`
+	// Refine is set when the load is refined in the start city before hauling; Buy is then the
+	// ingredient silver per refined item after the return rate.
+	Refine *TradeRefine `json:"refine,omitempty"`
+}
+
+type TradeRefine struct {
+	Raw        Item    `json:"raw"` // Count is raw per craft
+	RawPrice   int     `json:"rawPrice"`
+	Lower      *Item   `json:"lower"`
+	LowerPrice int     `json:"lowerPrice"`
+	RRR        float64 `json:"rrr"`
 }
 
 type TradeDest struct {
@@ -41,6 +52,7 @@ type TradeResult struct {
 	Kg           float64     `json:"kg"`
 	Budget       int         `json:"budget"`
 	Premium      bool        `json:"premium"`
+	Focus        bool        `json:"focus"`
 	SellFee      float64     `json:"sellFee"`
 	Destinations []TradeDest `json:"destinations"`
 }
@@ -69,12 +81,49 @@ func better(a, b *TradeOption) bool {
 	return b == nil || a.Trip > b.Trip || (a.Trip == b.Trip && a.Unit > b.Unit)
 }
 
-// computeTrade is pure: buy in `from`, carry kg (and at most budget silver, 0 = no limit), sell elsewhere.
-func computeTrade(from string, items []Item, prices map[string]map[string]Price, kg float64, budget int, premium bool, roads Roads) TradeResult {
+// tradePriceIDs adds the refining ingredients (raw and the tier-below refined item) to the items.
+func tradePriceIDs(items []Item) []string {
+	seen := map[string]bool{}
+	var ids []string
+	add := func(id string) {
+		if !seen[id] {
+			seen[id] = true
+			ids = append(ids, id)
+		}
+	}
+	for _, it := range items {
+		add(it.ID)
+		if rec, err := newRecipe(it.Resource, it.Tier, it.Enchant); it.Refined && err == nil {
+			add(rec.Raw.ID)
+			if rec.Lower != nil {
+				add(rec.Lower.ID)
+			}
+		}
+	}
+	return ids
+}
+
+// computeTrade is pure: buy in `from` (or buy the ingredients there and refine), carry kg
+// (and at most budget silver, 0 = no limit), sell in every other city.
+func computeTrade(from string, items []Item, prices map[string]map[string]Price, kg float64, budget int, premium, focus bool, roads Roads) TradeResult {
 	fee := sellFee(premium)
-	res := TradeResult{From: from, Kg: kg, Budget: budget, Premium: premium, SellFee: fee}
+	res := TradeResult{From: from, Kg: kg, Budget: budget, Premium: premium, Focus: focus, SellFee: fee}
 	if len(items) > 0 {
 		res.Enchant = items[0].Enchant
+	}
+	// option prices one load of `it` that costs `cost` silver per item in the start city.
+	option := func(it Item, cost float64, s Price, avgBuy bool, updated time.Time, ref *TradeRefine) *TradeOption {
+		units := int(math.Floor(kg/tierWeight[it.Tier] + 1e-9))
+		byBudget := budget > 0 && float64(budget) < cost*float64(units)
+		if byBudget {
+			units = int(float64(budget) / cost)
+		}
+		unit := float64(s.SellMin)*(1-fee) - cost
+		return &TradeOption{
+			Item: it, Buy: int(math.Round(cost)), Sell: s.SellMin, AvgBuy: avgBuy, AvgSell: s.Avg,
+			Unit: unit, Units: units, ByBudget: byBudget, Trip: unit * float64(units), Need: int(math.Round(cost * float64(units))),
+			Updated: updated, Refine: ref,
+		}
 	}
 	for _, city := range cities {
 		if city == from {
@@ -84,28 +133,41 @@ func computeTrade(from string, items []Item, prices map[string]map[string]Price,
 		if r, ok := roads[from][city]; ok {
 			d.Road = &r
 		}
-		for _, it := range items {
-			b, s := prices[it.ID][from], prices[it.ID][city]
-			if b.SellMin <= 0 || s.SellMin <= 0 {
-				continue
-			}
-			units := int(math.Floor(kg/tierWeight[it.Tier] + 1e-9))
-			byBudget := budget > 0 && budget/b.SellMin < units
-			if byBudget {
-				units = budget / b.SellMin
-			}
-			unit := float64(s.SellMin)*(1-fee) - float64(b.SellMin)
-			o := &TradeOption{
-				Item: it, Buy: b.SellMin, Sell: s.SellMin, AvgBuy: b.Avg, AvgSell: s.Avg,
-				Unit: unit, Units: units, ByBudget: byBudget, Trip: unit * float64(units), Need: units * b.SellMin,
-				Updated: oldest(b, s),
-			}
-			if i := slices.Index(tradeTiers, it.Tier); better(o, d.Tiers[i]) {
+		consider := func(o *TradeOption) {
+			if i := slices.Index(tradeTiers, o.Item.Tier); better(o, d.Tiers[i]) {
 				d.Tiers[i] = o
 			}
 			if better(o, d.Best) {
 				d.Best = o
 			}
+		}
+		for _, it := range items {
+			s := prices[it.ID][city]
+			if s.SellMin <= 0 {
+				continue
+			}
+			if b := prices[it.ID][from]; b.SellMin > 0 {
+				consider(option(it, float64(b.SellMin), s, b.Avg, oldest(b, s), nil))
+			}
+			if !it.Refined {
+				continue
+			}
+			// Refine in the start city: same recipe and return rate as the refining calculator; station fee left out.
+			rec, err := newRecipe(it.Resource, it.Tier, it.Enchant)
+			raw := prices[rec.Raw.ID][from]
+			if err != nil || raw.SellMin <= 0 {
+				continue
+			}
+			cost, low := float64(raw.SellMin*rec.Raw.Count), Price{}
+			if rec.Lower != nil {
+				if low = prices[rec.Lower.ID][from]; low.SellMin <= 0 {
+					continue
+				}
+				cost += float64(low.SellMin)
+			}
+			rrr := returnRate(from == resources[it.Resource].bonusCity, focus)
+			ref := &TradeRefine{Raw: rec.Raw, RawPrice: raw.SellMin, Lower: rec.Lower, LowerPrice: low.SellMin, RRR: rrr}
+			consider(option(it, cost*(1-rrr), s, raw.Avg || low.Avg, oldest(raw, low, s), ref))
 		}
 		res.Destinations = append(res.Destinations, d)
 	}

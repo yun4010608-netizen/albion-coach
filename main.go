@@ -75,7 +75,7 @@ func (a *App) Refine(ctx context.Context, res string, tier, enchant int, premium
 var errBadInput = errors.New("잘못된 요청")
 
 // Trade validates its input because the coach's tool calls reach it as well as the page.
-func (a *App) Trade(ctx context.Context, from string, enchant int, kg float64, budget int, premium, fresh bool) (TradeResult, error) {
+func (a *App) Trade(ctx context.Context, from string, enchant int, kg float64, budget int, premium, focus, fresh bool) (TradeResult, error) {
 	switch {
 	case !slices.Contains(cities, from):
 		return TradeResult{}, fmt.Errorf("%w: 출발 도시는 %s 중 하나여야 합니다", errBadInput, strings.Join(cities, ", "))
@@ -88,16 +88,25 @@ func (a *App) Trade(ctx context.Context, from string, enchant int, kg float64, b
 	if err != nil {
 		return TradeResult{}, fmt.Errorf("%w: %v", errBadInput, err)
 	}
-	ids := make([]string, len(items))
 	for i := range items {
-		ids[i] = items[i].ID
 		items[i].Name = a.names[items[i].ID]
 	}
-	prices, err := a.market.Prices(ctx, ids, fresh)
+	prices, err := a.market.Prices(ctx, tradePriceIDs(items), fresh)
 	if err != nil {
 		return TradeResult{}, err
 	}
-	return computeTrade(from, items, prices, kg, budget, premium, a.roads), nil
+	res := computeTrade(from, items, prices, kg, budget, premium, focus, a.roads)
+	for _, d := range res.Destinations {
+		for _, o := range append([]*TradeOption{d.Best}, d.Tiers...) {
+			if o != nil && o.Refine != nil {
+				o.Refine.Raw.Name = a.names[o.Refine.Raw.ID]
+				if o.Refine.Lower != nil {
+					o.Refine.Lower.Name = a.names[o.Refine.Lower.ID]
+				}
+			}
+		}
+	}
+	return res, nil
 }
 
 func writeJSON(w http.ResponseWriter, code int, v any) {
@@ -166,7 +175,7 @@ func (a *App) routes() http.Handler {
 			fail(w, http.StatusBadRequest, "enchant, kg, budget는 숫자여야 합니다")
 			return
 		}
-		res, err := a.Trade(r.Context(), q.Get("from"), enchant, kg, budget, q.Get("premium") == "1", q.Get("fresh") == "1")
+		res, err := a.Trade(r.Context(), q.Get("from"), enchant, kg, budget, q.Get("premium") == "1", q.Get("focus") == "1", q.Get("fresh") == "1")
 		if err != nil {
 			code := http.StatusBadGateway
 			if errors.Is(err, errBadInput) {

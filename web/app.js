@@ -266,8 +266,13 @@ function tquery() {
     kg: String(Math.min(20000, Math.max(1, Math.round(Number(f.kg.value) || OX_KG[4])))),
     budget: String(Math.max(0, Math.floor(Number(f.budget.value) || 0))),
     premium: f.premium.checked ? '1' : '0',
+    focus: f.focus.checked ? '1' : '0',
   });
 }
+
+// "T5 가죽" plus a 정제 tag when the load is refined in the start city.
+const itemText = (o) => label(o.item) + (o.refine ? '<span class="tag"> 정제</span>' : '');
+const recipeText = (r) => `${label(r.raw)} ${r.raw.count}개${r.lower ? ` + ${label(r.lower)} 1개` : ''}`;
 
 async function loadTrade(force, quiet) {
   const q = tquery();
@@ -354,12 +359,16 @@ function renderTrade(d, key) {
   } else if (top.best.trip > 0) {
     const o = top.best;
     const load = o.byBudget ? `자금 ${fmt(d.budget)} 한도로 ${fmt(o.units)}개` : `${fmt(d.kg)}kg에 ${fmt(o.units)}개`;
-    answer.innerHTML = `<h1>${d.from}에서 ${obj(label(o.item))} 사서 ${top.city}에 팔면 <span class="nw">한 번에</span> <span class="fig up">${TRI_UP}${fmt(o.trip)}</span> 은화</h1>
-      <p>${load} · 개당 ${signed(o.unit)} · 필요 자금 ${fmt(o.need)} · 판매 수수료 ${fee}%${caution(o)}</p>${roadWarn(top.city, top.road)}`;
+    const how = o.refine ? '정제해서' : '사서';
+    const refine = o.refine
+      ? ` · 재료 ${recipeText(o.refine)} · 리턴율 ${(o.refine.rrr * 100).toFixed(1)}%${d.focus ? ' (포커스)' : ''} · 제작소 사용료 빠짐`
+      : '';
+    answer.innerHTML = `<h1>${d.from}에서 ${obj(label(o.item))} ${how} ${top.city}에 팔면 <span class="nw">한 번에</span> <span class="fig up">${TRI_UP}${fmt(o.trip)}</span> 은화</h1>
+      <p>${load} · 개당 ${signed(o.unit)} · 필요 자금 ${fmt(o.need)}${refine} · 판매 수수료 ${fee}%${caution(o)}</p>${roadWarn(top.city, top.road)}`;
   } else {
     const o = top.best;
     answer.innerHTML = `<h1>지금은 ${d.from}에서 어디로 옮겨도 남는 물건이 없습니다</h1>
-      <p>그나마 나은 건 ${top.city}로 가는 ${label(o.item)}(개당 ${signed(o.unit)})입니다. 다른 출발 도시나 인챈트를 보세요.</p>`;
+      <p>그나마 나은 건 ${top.city}로 가는 ${label(o.item)}${o.refine ? '(정제)' : ''}(개당 ${signed(o.unit)})입니다. 다른 출발 도시나 인챈트를 보세요.</p>`;
   }
 
   if (!dests.some((x) => x.city === trade.dest && x.best)) trade.dest = top ? top.city : '';
@@ -375,8 +384,8 @@ function renderTrade(d, key) {
     return `<tr class="${o ? '' : 'missing'}${x === top ? ' best' : ''}">
       <td><div class="city"><button type="button" class="pick" data-city="${esc(x.city)}" aria-pressed="${sel}"${o ? '' : ' disabled'}><i class="chip" style="background:${CITY[x.city] || 'var(--mute)'}"></i><span class="cname">${x.city}</span></button>${sel ? '<span class="tag">티어별 보기</span>' : ''}</div>
         <div class="roadsub">${roadShort(x.road)}</div>
-        ${o ? `<div class="detail">${label(o.item)} · <span class="nw">${fmt(o.buy)} → ${fmt(o.sell)}</span><span class="nw"> · ${a.text}</span></div>` : ''}</td>
-      <td class="px item">${o ? label(o.item) : '—'}</td>
+        ${o ? `<div class="detail">${itemText(o)} · <span class="nw">${fmt(o.buy)} → ${fmt(o.sell)}</span><span class="nw"> · ${a.text}</span></div>` : ''}</td>
+      <td class="px item">${o ? itemText(o) : '—'}</td>
       <td class="px${cls('buy', o?.avgBuy)}">${priceText(o?.buy)}</td>
       <td class="px${cls('sell', o?.avgSell)}">${priceText(o?.sell)}</td>
       <td class="pl">${o ? signed(o.trip) : '<span class="nodata">데이터 없음</span>'}</td>
@@ -410,7 +419,7 @@ function renderTiers(changed) {
     }
     const a = ago(o.updated);
     return `<tr class="${o === x.best ? 'best' : ''}">
-      <td><div class="city">${label(o.item)}</div>
+      <td><div class="city">${itemText(o)}</div>
         <div class="detail"><span class="nw">개당 ${signed(o.unit)}</span> · <span class="nw">${fmt(o.units)}개</span> · <span class="nw">자금 ${fmt(o.need)}</span><span class="nw"> · ${a.text}</span></div></td>
       <td class="px${o.avgBuy || o.avgSell ? ' avg' : ''}">${signed(o.unit)}</td>
       <td class="px">${fmt(o.units)}개${o.byBudget ? '<span class="tag"> 자금 한도</span>' : ''}</td>

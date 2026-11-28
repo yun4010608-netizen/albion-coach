@@ -1,6 +1,7 @@
 package main
 
 import (
+	"slices"
 	"testing"
 	"time"
 )
@@ -32,7 +33,7 @@ func TestComputeTrade(t *testing.T) {
 		t4.ID: {"Martlock": p(100), "Lymhurst": p(148), "Thetford": p(90)},
 		t6.ID: {"Martlock": p(1000), "Lymhurst": p(1284), "Caerleon": {SellMin: 2000, SellMinDate: now, Avg: true}},
 	}
-	r := computeTrade("Martlock", []Item{t4, t6}, prices, 517, 0, true, nil)
+	r := computeTrade("Martlock", []Item{t4, t6}, prices, 517, 0, true, false, nil)
 	if len(r.Destinations) != 6 {
 		t.Fatalf("destinations = %d, want 6 (start city excluded)", len(r.Destinations))
 	}
@@ -76,10 +77,67 @@ func TestComputeTrade(t *testing.T) {
 	}
 
 	// A budget smaller than the load caps the units.
-	b := computeTrade("Martlock", []Item{t6}, prices, 517, 50_000, true, nil)
+	b := computeTrade("Martlock", []Item{t6}, prices, 517, 50_000, true, false, nil)
 	for _, d := range b.Destinations {
 		if d.City == "Lymhurst" && (d.Best.Units != 50 || !d.Best.ByBudget || d.Best.Need != 50_000) {
 			t.Errorf("budget cap: %+v", d.Best)
+		}
+	}
+}
+
+func TestComputeTradeRefine(t *testing.T) {
+	now := time.Now()
+	p := func(v int) Price { return Price{SellMin: v, SellMinDate: now} }
+	leather := Item{ID: "T5_LEATHER", Resource: "hide", Tier: 5, Refined: true}
+	prices := map[string]map[string]Price{
+		"T5_HIDE":    {"Martlock": p(100), "Thetford": p(100)},
+		"T4_LEATHER": {"Martlock": p(300), "Thetford": p(300)},
+		"T5_LEATHER": {"Lymhurst": p(1000)}, // not sold in the start city: refining is the only way
+	}
+	find := func(r TradeResult, city string) *TradeOption {
+		for _, d := range r.Destinations {
+			if d.City == city {
+				return d.Best
+			}
+		}
+		return nil
+	}
+	cases := []struct {
+		from  string
+		focus bool
+		rrr   float64
+	}{
+		{"Martlock", false, 1 - 1/1.58}, // hide's bonus city
+		{"Martlock", true, 1 - 1/2.17},  // bonus + focus
+		{"Thetford", false, 1 - 1/1.18}, // no bonus
+	}
+	for _, c := range cases {
+		o := find(computeTrade(c.from, []Item{leather}, prices, 517, 0, true, c.focus, nil), "Lymhurst")
+		if o == nil || o.Refine == nil {
+			t.Fatalf("%s focus=%v: no refine option: %+v", c.from, c.focus, o)
+		}
+		cost := (3*100 + 300) * (1 - c.rrr)
+		if d := o.Refine.RRR - c.rrr; d > 1e-9 || d < -1e-9 {
+			t.Errorf("%s focus=%v: rrr %v, want %v", c.from, c.focus, o.Refine.RRR, c.rrr)
+		}
+		if d := o.Unit - (1000*0.935 - cost); d > 1e-6 || d < -1e-6 {
+			t.Errorf("%s focus=%v: unit %v, want %v", c.from, c.focus, o.Unit, 1000*0.935-cost)
+		}
+		if o.Units != 680 || o.Refine.Raw.Count != 3 || o.Refine.Lower.ID != "T4_LEATHER" {
+			t.Errorf("%s: units %d raw %+v lower %+v", c.from, o.Units, o.Refine.Raw, o.Refine.Lower)
+		}
+	}
+
+	// When the refined item is also on sale in the start city for less, plain hauling wins.
+	prices["T5_LEATHER"]["Martlock"] = p(200)
+	if o := find(computeTrade("Martlock", []Item{leather}, prices, 517, 0, true, false, nil), "Lymhurst"); o.Refine != nil || o.Buy != 200 {
+		t.Errorf("buying ready leather at 200 should beat refining at ~380: %+v", o)
+	}
+
+	ids := tradePriceIDs([]Item{{ID: "T4_LEATHER", Resource: "hide", Tier: 4, Refined: true}, leather})
+	for _, want := range []string{"T4_LEATHER", "T4_HIDE", "T3_LEATHER", "T5_LEATHER", "T5_HIDE"} {
+		if !slices.Contains(ids, want) {
+			t.Errorf("price ids %v miss %s", ids, want)
 		}
 	}
 }

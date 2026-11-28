@@ -78,6 +78,7 @@ type tradeInput struct {
 	Kg      float64 `json:"kg" jsonschema:"required,minimum=1,maximum=20000,description=weight the player can carry. Transport ox estimates: T3 413 T4 517 T5 689 T6 954 T7 1349 T8 1935"`
 	Budget  int     `json:"budget" jsonschema:"minimum=0,description=silver the player can spend on goods; 0 for no limit"`
 	Premium bool    `json:"premium" jsonschema:"description=premium account (4% sales tax instead of 8%)"`
+	Focus   bool    `json:"focus" jsonschema:"description=spend focus when refining in the start city (premium players)"`
 }
 
 type findInput struct {
@@ -126,9 +127,9 @@ func NewCoach(client anthropic.Client, model, guide string, app *App) (*Coach, e
 		return nil, err
 	}
 	trade, err := toolrunner.NewBetaToolFromJSONSchema("trade_routes",
-		"Hauling profit on the Asia server: buy raw or refined resources (T4-T8) at the cheapest sell order in one city, carry a given weight, and sell in each other royal city. Returns, per destination, the best item and the best item of each tier with profit per item, units that fit, profit per trip, silver needed and data age.",
+		"Hauling profit on the Asia server: buy raw or refined resources (T4-T8) at the cheapest sell order in one city, or buy the ingredients there and refine first (option.refine set; return rate applied, station fee left out), carry a given weight, and sell in each other royal city. Returns, per destination, the road (zones crossed, red/black counts), the best option and the best option of each tier with profit per item, units that fit, profit per trip, silver needed and data age.",
 		func(ctx context.Context, in tradeInput) (anthropic.BetaToolResultBlockParamContentUnion, error) {
-			return jsonResult(app.Trade(ctx, in.From, in.Enchant, in.Kg, in.Budget, in.Premium, false))
+			return jsonResult(app.Trade(ctx, in.From, in.Enchant, in.Kg, in.Budget, in.Premium, in.Focus, false))
 		})
 	if err != nil {
 		return nil, err
