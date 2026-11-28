@@ -296,9 +296,41 @@ async function loadTrade(force, quiet) {
     $('#trows').innerHTML = '';
     $('#tiers').innerHTML = '';
     $('#ttitle').textContent = '';
+    $('#troad').innerHTML = '';
   } finally {
     $('#trefresh').disabled = false;
   }
+}
+
+// Zone kinds read the way the game names them. Danger is set in Numeral White bold, never in the market red.
+const KIND = { city: '도시', yellow: '옐로', red: '레드', black: '블랙' };
+function roadShort(r) {
+  if (!r) return '';
+  if (!r.found) return '<span class="risk">미스트 경유</span>';
+  const hops = r.zones.length;
+  const danger = [r.red && `레드 ${r.red}`, r.black && `블랙 ${r.black}`].filter(Boolean).join(' · ');
+  if (danger) return `<span class="risk">${danger}</span><span class="calm"> / ${hops}칸</span>`;
+  return `<span class="calm">${r.yellow ? '블루·옐로' : '블루'} ${hops}칸</span>`;
+}
+function roadWarn(city, r) {
+  if (!r) return '';
+  if (!r.found) return `<p class="risk-line">${city}에는 고정된 길이 없어 미스트 입구를 찾아 들어가야 합니다.</p>`;
+  if (!r.red && !r.black) return '';
+  const zones = [r.red && `레드 존 ${r.red}곳`, r.black && `블랙 존 ${r.black}곳`].filter(Boolean).join('과 ');
+  return `<p class="risk-line">가는 길에 ${zones}을 지나야 합니다. 죽으면 가진 것을 모두 잃어요.</p>`;
+}
+function roadLine(from, to, r) {
+  if (!r) return '';
+  if (!r.found) return `${esc(to)}에는 고정된 길이 없습니다. 미스트 입구를 찾아 들어가야 합니다.`;
+  const step = (z) => (z.kind === 'red' || z.kind === 'black'
+    ? `<strong>${esc(z.name)}(${KIND[z.kind]})</strong>`
+    : esc(z.name) + (KIND[z.kind] ? `(${KIND[z.kind]})` : ''));
+  let s = `가는 길: ${esc(from)} → ${r.zones.map(step).join(' → ')} → ${esc(to)}`;
+  if (r.shortcut) {
+    const via = [r.shortcut.red && `레드 ${r.shortcut.red}곳`, r.shortcut.black && `블랙 ${r.shortcut.black}곳`].filter(Boolean).join(', ');
+    s += `<br>${via}을 지나면 ${r.shortcut.hops}칸으로 ${r.zones.length - r.shortcut.hops}칸 짧아집니다.`;
+  }
+  return s;
 }
 
 function caution(o) {
@@ -323,7 +355,7 @@ function renderTrade(d, key) {
     const o = top.best;
     const load = o.byBudget ? `자금 ${fmt(d.budget)} 한도로 ${fmt(o.units)}개` : `${fmt(d.kg)}kg에 ${fmt(o.units)}개`;
     answer.innerHTML = `<h1>${d.from}에서 ${obj(label(o.item))} 사서 ${top.city}에 팔면 <span class="nw">한 번에</span> <span class="fig up">${TRI_UP}${fmt(o.trip)}</span> 은화</h1>
-      <p>${load} · 개당 ${signed(o.unit)} · 필요 자금 ${fmt(o.need)} · 판매 수수료 ${fee}%${caution(o)}</p>`;
+      <p>${load} · 개당 ${signed(o.unit)} · 필요 자금 ${fmt(o.need)} · 판매 수수료 ${fee}%${caution(o)}</p>${roadWarn(top.city, top.road)}`;
   } else {
     const o = top.best;
     answer.innerHTML = `<h1>지금은 ${d.from}에서 어디로 옮겨도 남는 물건이 없습니다</h1>
@@ -342,6 +374,7 @@ function renderTrade(d, key) {
     const sel = x.city === trade.dest;
     return `<tr class="${o ? '' : 'missing'}${x === top ? ' best' : ''}">
       <td><div class="city"><button type="button" class="pick" data-city="${esc(x.city)}" aria-pressed="${sel}"${o ? '' : ' disabled'}><i class="chip" style="background:${CITY[x.city] || 'var(--mute)'}"></i><span class="cname">${x.city}</span></button>${sel ? '<span class="tag">티어별 보기</span>' : ''}</div>
+        <div class="roadsub">${roadShort(x.road)}</div>
         ${o ? `<div class="detail">${label(o.item)} · <span class="nw">${fmt(o.buy)} → ${fmt(o.sell)}</span><span class="nw"> · ${a.text}</span></div>` : ''}</td>
       <td class="px item">${o ? label(o.item) : '—'}</td>
       <td class="px${cls('buy', o?.avgBuy)}">${priceText(o?.buy)}</td>
@@ -361,10 +394,12 @@ function renderTiers(changed) {
   const x = d && d.destinations.find((y) => y.city === trade.dest);
   if (!x) {
     $('#ttitle').textContent = '';
+    $('#troad').innerHTML = '';
     $('#tiers').innerHTML = '';
     return;
   }
   $('#ttitle').textContent = `${d.from} → ${x.city}, 티어별로 옮기면`;
+  $('#troad').innerHTML = roadLine(d.from, x.city, x.road);
   const opts = x.tiers.filter(Boolean);
   const max = Math.max(1, ...opts.map((o) => Math.abs(o.trip)));
   $('#tiers').innerHTML = x.tiers.map((o, i) => {

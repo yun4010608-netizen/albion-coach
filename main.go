@@ -31,12 +31,16 @@ var namesJSON []byte
 //go:embed knowledge/guide.md
 var guideMD string
 
+//go:embed zones.json
+var zonesJSON []byte
+
 type App struct {
 	market   *Market
 	gameinfo *Gameinfo
 	names    map[string]string
 	coach    *Coach
 	notes    *Notes // nil without DATABASE_URL
+	roads    Roads
 	draining atomic.Bool
 }
 
@@ -93,7 +97,7 @@ func (a *App) Trade(ctx context.Context, from string, enchant int, kg float64, b
 	if err != nil {
 		return TradeResult{}, err
 	}
-	return computeTrade(from, items, prices, kg, budget, premium), nil
+	return computeTrade(from, items, prices, kg, budget, premium, a.roads), nil
 }
 
 func writeJSON(w http.ResponseWriter, code int, v any) {
@@ -262,6 +266,12 @@ func main() {
 		slog.Error("names.json", "err", err)
 		os.Exit(1)
 	}
+	roads, err := LoadRoads(zonesJSON)
+	if err != nil {
+		slog.Error("zones.json", "err", err)
+		os.Exit(1)
+	}
+	app.roads = roads
 	if url := os.Getenv("DATABASE_URL"); url != "" {
 		notes, err := OpenNotes(url)
 		if err != nil {

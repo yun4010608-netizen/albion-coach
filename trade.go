@@ -30,6 +30,7 @@ type TradeOption struct {
 
 type TradeDest struct {
 	City  string         `json:"city"`
+	Road  *Road          `json:"road"` // nil when the zone map is not loaded
 	Best  *TradeOption   `json:"best"`
 	Tiers []*TradeOption `json:"tiers"` // T4..T8; nil where no item of that tier has both prices
 }
@@ -69,7 +70,7 @@ func better(a, b *TradeOption) bool {
 }
 
 // computeTrade is pure: buy in `from`, carry kg (and at most budget silver, 0 = no limit), sell elsewhere.
-func computeTrade(from string, items []Item, prices map[string]map[string]Price, kg float64, budget int, premium bool) TradeResult {
+func computeTrade(from string, items []Item, prices map[string]map[string]Price, kg float64, budget int, premium bool, roads Roads) TradeResult {
 	fee := sellFee(premium)
 	res := TradeResult{From: from, Kg: kg, Budget: budget, Premium: premium, SellFee: fee}
 	if len(items) > 0 {
@@ -80,6 +81,9 @@ func computeTrade(from string, items []Item, prices map[string]map[string]Price,
 			continue
 		}
 		d := TradeDest{City: city, Tiers: make([]*TradeOption, len(tradeTiers))}
+		if r, ok := roads[from][city]; ok {
+			d.Road = &r
+		}
 		for _, it := range items {
 			b, s := prices[it.ID][from], prices[it.ID][city]
 			if b.SellMin <= 0 || s.SellMin <= 0 {

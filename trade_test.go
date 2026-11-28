@@ -32,7 +32,7 @@ func TestComputeTrade(t *testing.T) {
 		t4.ID: {"Martlock": p(100), "Lymhurst": p(148), "Thetford": p(90)},
 		t6.ID: {"Martlock": p(1000), "Lymhurst": p(1284), "Caerleon": {SellMin: 2000, SellMinDate: now, Avg: true}},
 	}
-	r := computeTrade("Martlock", []Item{t4, t6}, prices, 517, 0, true)
+	r := computeTrade("Martlock", []Item{t4, t6}, prices, 517, 0, true, nil)
 	if len(r.Destinations) != 6 {
 		t.Fatalf("destinations = %d, want 6 (start city excluded)", len(r.Destinations))
 	}
@@ -76,7 +76,7 @@ func TestComputeTrade(t *testing.T) {
 	}
 
 	// A budget smaller than the load caps the units.
-	b := computeTrade("Martlock", []Item{t6}, prices, 517, 50_000, true)
+	b := computeTrade("Martlock", []Item{t6}, prices, 517, 50_000, true, nil)
 	for _, d := range b.Destinations {
 		if d.City == "Lymhurst" && (d.Best.Units != 50 || !d.Best.ByBudget || d.Best.Need != 50_000) {
 			t.Errorf("budget cap: %+v", d.Best)

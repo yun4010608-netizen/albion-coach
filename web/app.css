@@ -65,6 +65,8 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .pane { overflow-y: auto; grid-row: 1; }
 .board { grid-column: 1; padding: 20px 28px 32px; border-right: 1px solid var(--rule); }
 .coach { grid-column: 2; display: flex; flex-direction: column; }
+/* ladders fold to the board's width, not the window's: a 1280px laptop leaves the board ~780px */
+.board { container-type: inline-size; }
 
 /* filters: standard controls */
 .filters { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; margin-bottom: 24px; }
@@ -142,7 +144,12 @@ tr.best td:first-child { font-weight: 700; }
 .trade td.item { color: var(--ink); }
 .subhead { margin: 32px 0 0; font-size: 15px; font-weight: 600; letter-spacing: -0.01em; }
 .subhead:empty { display: none; }
-.subhead + .ladder { margin-top: 0; }
+.road-line { margin: 6px 0 4px; color: var(--mute); font-size: 13px; max-width: 72ch; }
+.road-line:empty { display: none; }
+.road-line strong, .risk { color: var(--ink); font-weight: 600; }
+.calm { color: var(--mute); }
+.roadsub { font-size: 12px; margin-top: 2px; white-space: normal; }
+.answer p.risk-line { color: var(--ink); }
 .tiers:has(tbody:empty) { display: none; }
 
 /* notes */
@@ -192,6 +199,13 @@ tr.best td:first-child { font-weight: 700; }
 #send:disabled { opacity: .5; cursor: default; }
 .ask textarea:disabled { opacity: .6; }
 
+@container (max-width: 900px) {
+  .ladder .px, .ladder .age-h, .ladder td.age { display: none; }
+  .ladder .detail { display: block; }
+  .ladder .avg-tag { display: inline; }
+}
+@container (max-width: 700px) { .ladder { --bar-max: 60px; } }
+@container (max-width: 480px) { .ladder { --bar-max: 40px; } }
 @media (min-width: 1100px) {
   .tabs .t-coach { display: none; }
   .board.is-left-off { display: none; }
