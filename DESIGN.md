@@ -265,8 +265,8 @@ Heraldic colours for the seven royal cities, shown only as a 9px square chip bef
 
 The page is a fixed shell: a 56px top bar with a 1px rule under it, and below it panes that fill the remaining dynamic viewport height and scroll independently.
 
-- **1100px and wider:** two columns. The calculator takes the flexible left column (28px side gutters, 20px top), the coach takes a fixed 440px right column, and a 1px rule divides them. The tab buttons are hidden because both panes are visible.
-- **Below 1100px:** one pane at a time. Tabs (정제 계산기 / 코치) appear in the top bar, the selected one underlined, and the other pane is removed from view.
+- **1100px and wider:** two columns. The flexible left column (28px side gutters, 20px top) holds one board at a time (무역 루트, 정제 계산기 or 자료), chosen by the top-bar tabs; the coach takes a fixed 440px right column, and a 1px rule divides them. The 코치 tab is hidden because the coach is always visible.
+- **Below 1100px:** one pane at a time. Four tabs (무역 루트 / 정제 계산기 / 자료 / 코치) in the top bar, the selected one underlined. At 760px and narrower the labels shorten to 무역 / 정제 / 자료 / 코치, and under 480px the "Asia 서버" label leaves the bar.
 - **760px and narrower (phone):** 16px side gutters (respecting safe-area insets), profit bars shrink to 40px per side, the three price columns and the age column leave the ladder and fold into a 12px detail sub-line under each city name (raw × count + lower → product · age). Every select, input, ghost button, checkbox row and starter prompt is at least 44px tall, segment options grow to 11px vertical padding, and checkboxes grow to 20px.
 
 Calculator rhythm, top to bottom: a wrapping filter row (10px row gap, 14px column gap, refresh pushed to the far right on wide screens), 24px space, the answer block (reserved minimum height of 112px so loading does not shift the ladder, 20px bottom padding, 1px rule), the ladder, then route and source notes 18px below. Coach rhythm: messages in a column with 16px gaps and 24px side gutters, starter prompts stacked left with 8px gaps, and the ask form pinned to the bottom of the pane with a 1px top rule.
@@ -324,6 +324,19 @@ A quote ladder, one city per row, ranked by profit with unpriced cities last.
 - **Profit bars:** 12px tall, square-ended, growing right of the axis in Gain Red or left of it in Loss Blue, with a 1px gap at the axis. Length is relative to the largest absolute profit in view, up to 120px per side (40px on phone). When the recipe changes, bars grow from the axis over 0.7s on an exponential ease-out (cubic-bezier(.16, 1, .3, 1)).
 - **Refresh tick:** a price cell whose value changed since the last load gets a 22% Refresh Amber wash, fading over 2.4s on the same curve.
 - **Reduced motion:** both the bar growth and the tick are removed.
+
+### Trade Route Board
+The same quote-board grammar as the calculator, applied to hauling from a start city.
+- **Answer sentence:** "Martlock에서 T7 보강 처리한 피혁을 사서 Caerleon에 팔면 한 번에 ▲1,164,210 은화", the trip profit at Display scale; "한 번에" never breaks from itself. The evidence line gives the load (kg and units, or the budget cap), profit per unit, silver needed and the sales fee, then the same stale/average caution as the calculator.
+- **Filters:** start city, mount select (each transport ox labelled with its estimated load), the editable 실을 무게 field with a Ledger Grey "kg" suffix (editing it switches the mount to 직접 입력), an optional 자금 field (12ch, placeholder 제한 없음), enchant, premium, auto refresh, refresh.
+- **Destination ladder:** one row per other royal city, ranked by trip profit: tincture chip and city name (a text button that picks the city for the tier table, underlined in Ledger Grey on hover; the picked row carries a 12px 티어별 보기 tag), the best item, buy price, sell price, signed trip profit, centre-axis bar, data age. Phone folds item, prices and age into the detail sub-line, each segment kept whole.
+- **Tier table:** a 15px/600 heading ("Martlock → Caerleon, 티어별로 옮기면"), then T4–T8 rows with the best item of that tier, profit per unit, units that fit (자금 한도 tag when the budget caps it), silver needed, signed trip profit, bar, age. A tier without prices reads 데이터 없음.
+
+### Notes List
+Facts the coach saved, newest first, in a 72ch column on the ground; no cards.
+- **Answer slot:** "코치가 모은 자료 N건" with the newest topic and its age underneath; the empty state explains how notes appear; errors speak in Numeral White.
+- **Note row:** topic (15px/600) with its age at the right in 13px Ledger Grey ("· 다시 확인 예정" after 30 days), the body rendered like a coach reply, then a 13px Ledger Grey source line of links beside a ghost 지우기 button. A 1px Hairline rule closes each row.
+- **Delete:** two presses within 3 seconds (한 번 더 누르면 지워집니다), like 대화 지우기; a failure adds a Numeral White line under the row.
 
 ### Coach Thread
 - **Player message:** right-aligned Raised Graphite bubble, 2px corners, 10px × 14px padding, preserving line breaks.

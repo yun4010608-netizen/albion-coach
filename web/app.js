@@ -25,20 +25,80 @@ function ago(iso) {
   return { text, stale: m > 360 };
 }
 
-/* ---------- tabs (below 1100px one pane at a time) ---------- */
+// Korean object particle: 을 after a final consonant, 를 after a vowel.
+const obj = (w) => {
+  const c = w.charCodeAt(w.length - 1) - 0xac00;
+  return w + (c < 0 || c > 11171 ? '을(를)' : c % 28 ? '을' : '를');
+};
+
+/* ---------- tabs: boards share the left column next to the coach; below 1100px one pane at a time ---------- */
 const tabs = [...document.querySelectorAll('[role="tab"]')];
-function showTab(tab) {
+const wide = matchMedia('(min-width: 1100px)');
+const HASH = { 'tab-calc': '#calc', 'tab-notes': '#notes', 'tab-coach': '#coach' };
+const onShow = {}; // tab id -> runs whenever that pane comes into view
+let current = 'tab-trade';
+let board = 'tab-trade'; // the board beside the coach on wide screens
+function showTab(id) {
+  current = id;
+  if (id !== 'tab-coach') board = id;
+  const selected = wide.matches && id === 'tab-coach' ? board : id;
   for (const t of tabs) {
-    const on = t === tab;
-    t.setAttribute('aria-selected', String(on));
-    document.getElementById(t.getAttribute('aria-controls')).classList.toggle('is-off', !on);
+    t.setAttribute('aria-selected', String(t.id === selected));
+    const pane = document.getElementById(t.getAttribute('aria-controls'));
+    pane.classList.toggle('is-off', t.id !== id);
+    pane.classList.toggle('is-left-off', t.id !== board);
   }
+  onShow[wide.matches ? board : id]?.();
 }
 tabs.forEach((t) => t.addEventListener('click', () => {
-  showTab(t);
-  window.history.replaceState(null, '', t.id === 'tab-coach' ? '#coach' : location.pathname);
+  showTab(t.id);
+  window.history.replaceState(null, '', HASH[t.id] || location.pathname);
 }));
-showTab(location.hash === '#coach' ? tabs[1] : tabs[0]);
+wide.addEventListener('change', () => showTab(current));
+
+const AUTO_MS = 5 * 60 * 1000; // matches the server's price cache
+
+// Remembers a board's filters in this browser.
+function persist(formEl, key) {
+  try {
+    for (const [k, v] of Object.entries(JSON.parse(localStorage.getItem(key)) || {})) {
+      const el = formEl.elements[k];
+      if (!el) continue;
+      if (el.type === 'checkbox') el.checked = v;
+      else el.value = v;
+    }
+  } catch { /* storage blocked: start from defaults */ }
+  formEl.addEventListener('change', () => {
+    const v = {};
+    for (const el of formEl.elements) {
+      if (!el.name || (el.type === 'radio' && !el.checked)) continue;
+      v[el.name] = el.type === 'checkbox' ? el.checked : el.value;
+    }
+    try { localStorage.setItem(key, JSON.stringify(v)); } catch { /* not persisted */ }
+  });
+}
+
+// Five-minute refresh for a board with an `auto` checkbox. A phone that slept past a refresh
+// catches up as soon as it is looked at again. Returns the function that re-reads the checkbox.
+function autoRefresh(formEl, load, lastAt) {
+  let timer = null;
+  const schedule = () => {
+    clearInterval(timer);
+    timer = formEl.auto.checked ? setInterval(() => { if (document.visibilityState === 'visible') load(); }, AUTO_MS) : null;
+  };
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible' && formEl.auto.checked && Date.now() - lastAt() >= AUTO_MS) load();
+  });
+  schedule();
+  return schedule;
+}
+
+const priceText = (v) => (v ? fmt(v) : '—');
+const bar = (p, w) => `<td class="axis"><div class="track"><i class="fill ${p >= 0 ? 'gain' : 'loss'}" style="--w:calc(var(--bar-max) * ${w.toFixed(3)})"></i></div></td>`;
+function grow(tbody) {
+  tbody.classList.add('grow');
+  requestAnimationFrame(() => requestAnimationFrame(() => tbody.classList.remove('grow')));
+}
 
 /* ---------- calculator ---------- */
 const form = $('#filters');
@@ -59,7 +119,6 @@ function label(item) {
   return `T${item.tier}${item.enchant ? '.' + item.enchant : ''} ${name}`;
 }
 
-const AUTO_MS = 5 * 60 * 1000; // matches the server's price cache
 let lastLoadAt = 0;
 
 // quiet = background refresh: keep what is on screen, report failures in one line.
@@ -136,14 +195,14 @@ function render(d, key) {
   const cells = {};
   $('#rows').innerHTML = rows.map((r) => {
     const name = r.city;
-    const tint = CITY[r.city] || '#888';
+    const tint = CITY[r.city] || 'var(--mute)';
     const a = ago(r.updated);
     const p = pick(r);
     const vals = { raw: r.rawPrice, lower: r.lowerPrice, product: r.productPrice };
     for (const k in vals) cells[r.city + k] = vals[k];
     const avg = { raw: r.avgRaw, lower: r.avgLower, product: r.avgProduct };
     const flash = (k) => (!recipeChanged && last.cells[r.city + k] !== undefined && last.cells[r.city + k] !== vals[k] ? ' fresh' : '') + (avg[k] ? ' avg' : '');
-    const price = (v) => (v ? fmt(v) : '—');
+    const price = priceText;
     const w = r.missing ? 0 : Math.abs(p) / max;
     return `<tr class="${r.missing ? 'missing' : ''}${r === best ? ' best' : ''}">
       <td><div class="city"><i class="chip" style="background:${tint}"></i>${name}${r.bonus ? '<span class="tag">정제 보너스</span>' : ''}${r.avgRaw || r.avgLower || r.avgProduct ? '<span class="tag avg-tag">평균가</span>' : ''}</div>
@@ -152,17 +211,13 @@ function render(d, key) {
       <td class="px${flash('lower')}">${d.lower ? price(r.lowerPrice) : '—'}</td>
       <td class="px${flash('product')}">${price(r.productPrice)}</td>
       <td class="pl">${r.missing ? '<span class="nodata">데이터 없음</span>' : signed(p)}</td>
-      <td class="axis"><div class="track"><i class="fill ${p >= 0 ? 'gain' : 'loss'}" style="--w:calc(var(--bar-max) * ${w.toFixed(3)})"></i></div></td>
+      ${bar(p, w)}
       <td class="age">${a.text}</td>
     </tr>`;
   }).join('');
   last = { key: key.replace('&fresh=1', ''), cells };
 
-  if (recipeChanged) {
-    const tb = $('#rows');
-    tb.classList.add('grow');
-    requestAnimationFrame(() => requestAnimationFrame(() => tb.classList.remove('grow')));
-  }
+  if (recipeChanged) grow($('#rows'));
 
   const route = d.route && (focus ? d.route.profitFocus : d.route.profit);
   const rt = d.route;
@@ -175,34 +230,8 @@ function render(d, key) {
 }
 
 let lastData = null;
-const FKEY = 'albion-coach.filters.v1';
-try {
-  const saved = JSON.parse(localStorage.getItem(FKEY)) || {};
-  for (const [k, v] of Object.entries(saved)) {
-    const el = form.elements[k];
-    if (!el) continue;
-    if (el instanceof RadioNodeList) el.value = v;
-    else if (el.type === 'checkbox') el.checked = v;
-    else el.value = v;
-  }
-} catch { /* storage blocked: start from defaults */ }
-form.addEventListener('change', () => {
-  const f = form.elements;
-  const v = { resource: f.resource.value, tier: f.tier.value, enchant: f.enchant.value, fee: f.fee.value, premium: f.premium.checked, focus: f.focus.checked, auto: f.auto.checked };
-  try { localStorage.setItem(FKEY, JSON.stringify(v)); } catch { /* not persisted */ }
-});
-let autoTimer = null;
-function scheduleAuto() {
-  clearInterval(autoTimer);
-  autoTimer = form.auto.checked
-    ? setInterval(() => { if (document.visibilityState === 'visible') loadRefine(true, true); }, AUTO_MS)
-    : null;
-}
-// A phone that slept past a refresh catches up as soon as it is looked at again.
-document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'visible' && form.auto.checked && Date.now() - lastLoadAt >= AUTO_MS) loadRefine(true, true);
-});
-scheduleAuto();
+persist(form, 'albion-coach.filters.v1');
+const scheduleAuto = autoRefresh(form, () => loadRefine(true, true), () => lastLoadAt);
 
 form.addEventListener('change', (e) => {
   if (e.target.name === 'auto') {
@@ -217,7 +246,240 @@ form.addEventListener('change', (e) => {
 });
 form.addEventListener('submit', (e) => e.preventDefault());
 $('#refresh').addEventListener('click', () => loadRefine(true));
-loadRefine(false);
+onShow['tab-calc'] = () => { if (!lastLoadAt && !$('#refresh').disabled) loadRefine(false); };
+
+/* ---------- trade route ---------- */
+// Transport ox load per tier, estimated from game data as mount weight × HALFMOUNTED maxload
+// (items.xml + spells.xml, ao-bin-dumps 2026-11-26). Not checked against the in-game tooltip,
+// so the weight field stays editable and the source note says so.
+const OX_KG = { 3: 413, 4: 517, 5: 689, 6: 954, 7: 1349, 8: 1935 };
+const tform = $('#tfilters');
+for (const o of tform.mount.options) if (OX_KG[o.value]) o.textContent += ` · 약 ${fmt(OX_KG[o.value])}kg`;
+persist(tform, 'albion-coach.trade.v1');
+let trade = { key: '', data: null, at: 0, dest: '', cells: {} };
+
+function tquery() {
+  const f = tform.elements;
+  return new URLSearchParams({
+    from: f.from.value,
+    enchant: f.enchant.value,
+    kg: String(Math.min(20000, Math.max(1, Math.round(Number(f.kg.value) || OX_KG[4])))),
+    budget: String(Math.max(0, Math.floor(Number(f.budget.value) || 0))),
+    premium: f.premium.checked ? '1' : '0',
+  });
+}
+
+async function loadTrade(force, quiet) {
+  const q = tquery();
+  if (force) q.set('fresh', '1');
+  const answer = $('#tanswer');
+  if (!quiet) {
+    answer.className = 'answer loading';
+    answer.innerHTML = '<h1>시세를 불러오는 중…</h1>';
+  }
+  $('#trefresh').disabled = true;
+  try {
+    const r = await fetch('/api/trade?' + q);
+    const data = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(data.error || `HTTP ${r.status}`);
+    trade.at = Date.now();
+    $('#tautonote').textContent = '';
+    renderTrade(data, q.toString().replace('&fresh=1', ''));
+  } catch (e) {
+    if (quiet && trade.data) {
+      const next = new Date(Date.now() + AUTO_MS).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
+      $('#tautonote').textContent = `자동 새로고침 실패: ${e.message}. ${next}에 다시 시도합니다.`;
+      return;
+    }
+    answer.className = 'answer error';
+    answer.innerHTML = `<h1>시세를 가져오지 못했습니다</h1><p>${esc(e.message)}. 잠시 뒤 '시세 새로고침'을 눌러 다시 시도하세요.</p>`;
+    $('#trows').innerHTML = '';
+    $('#tiers').innerHTML = '';
+    $('#ttitle').textContent = '';
+  } finally {
+    $('#trefresh').disabled = false;
+  }
+}
+
+function caution(o) {
+  if (o.avgBuy || o.avgSell) return ' · 회색 가격은 최근 하루 평균 거래가라 실제 주문가와 다를 수 있어요';
+  const a = ago(o.updated);
+  return a.stale ? ` · 시세가 ${a.text} 값이라 게임에서 한 번 확인하세요` : '';
+}
+
+function renderTrade(d, key) {
+  const changed = key !== trade.key;
+  trade = { ...trade, key, data: d };
+  const dests = d.destinations;
+  const priced = dests.filter((x) => x.best);
+  const top = priced[0];
+  const fee = (d.sellFee * 100).toFixed(1).replace(/\.0$/, '');
+
+  const answer = $('#tanswer');
+  answer.className = 'answer';
+  if (!top) {
+    answer.innerHTML = `<h1>${d.from} 시세가 부족해서 계산할 수 없습니다</h1><p>Asia 서버에 최근 7일 동안 ${d.from}에서 이 인챈트의 자원·정제품 거래 기록이 거의 없어요. 다른 출발 도시나 인챈트를 보거나, 게임에서 Albion Data Client를 켜고 시장을 열면 데이터가 채워집니다.</p>`;
+  } else if (top.best.trip > 0) {
+    const o = top.best;
+    const load = o.byBudget ? `자금 ${fmt(d.budget)} 한도로 ${fmt(o.units)}개` : `${fmt(d.kg)}kg에 ${fmt(o.units)}개`;
+    answer.innerHTML = `<h1>${d.from}에서 ${obj(label(o.item))} 사서 ${top.city}에 팔면 <span class="nw">한 번에</span> <span class="fig up">${TRI_UP}${fmt(o.trip)}</span> 은화</h1>
+      <p>${load} · 개당 ${signed(o.unit)} · 필요 자금 ${fmt(o.need)} · 판매 수수료 ${fee}%${caution(o)}</p>`;
+  } else {
+    const o = top.best;
+    answer.innerHTML = `<h1>지금은 ${d.from}에서 어디로 옮겨도 남는 물건이 없습니다</h1>
+      <p>그나마 나은 건 ${top.city}로 가는 ${label(o.item)}(개당 ${signed(o.unit)})입니다. 다른 출발 도시나 인챈트를 보세요.</p>`;
+  }
+
+  if (!dests.some((x) => x.city === trade.dest && x.best)) trade.dest = top ? top.city : '';
+  const max = Math.max(1, ...priced.map((x) => Math.abs(x.best.trip)));
+  const cells = {};
+  $('#trows').innerHTML = dests.map((x) => {
+    const o = x.best;
+    const a = o ? ago(o.updated) : { text: '없음' };
+    const vals = { buy: o?.buy, sell: o?.sell };
+    for (const k in vals) cells[x.city + k] = vals[k];
+    const cls = (k, avg) => (!changed && trade.cells[x.city + k] !== undefined && trade.cells[x.city + k] !== vals[k] ? ' fresh' : '') + (avg ? ' avg' : '');
+    const sel = x.city === trade.dest;
+    return `<tr class="${o ? '' : 'missing'}${x === top ? ' best' : ''}">
+      <td><div class="city"><button type="button" class="pick" data-city="${esc(x.city)}" aria-pressed="${sel}"${o ? '' : ' disabled'}><i class="chip" style="background:${CITY[x.city] || 'var(--mute)'}"></i><span class="cname">${x.city}</span></button>${sel ? '<span class="tag">티어별 보기</span>' : ''}</div>
+        ${o ? `<div class="detail">${label(o.item)} · <span class="nw">${fmt(o.buy)} → ${fmt(o.sell)}</span><span class="nw"> · ${a.text}</span></div>` : ''}</td>
+      <td class="px item">${o ? label(o.item) : '—'}</td>
+      <td class="px${cls('buy', o?.avgBuy)}">${priceText(o?.buy)}</td>
+      <td class="px${cls('sell', o?.avgSell)}">${priceText(o?.sell)}</td>
+      <td class="pl">${o ? signed(o.trip) : '<span class="nodata">데이터 없음</span>'}</td>
+      ${bar(o ? o.trip : 0, o ? Math.abs(o.trip) / max : 0)}
+      <td class="age">${a.text}</td>
+    </tr>`;
+  }).join('');
+  trade.cells = cells;
+  if (changed) grow($('#trows'));
+  renderTiers(changed);
+}
+
+function renderTiers(changed) {
+  const d = trade.data;
+  const x = d && d.destinations.find((y) => y.city === trade.dest);
+  if (!x) {
+    $('#ttitle').textContent = '';
+    $('#tiers').innerHTML = '';
+    return;
+  }
+  $('#ttitle').textContent = `${d.from} → ${x.city}, 티어별로 옮기면`;
+  const opts = x.tiers.filter(Boolean);
+  const max = Math.max(1, ...opts.map((o) => Math.abs(o.trip)));
+  $('#tiers').innerHTML = x.tiers.map((o, i) => {
+    const tier = `T${i + 4}`;
+    if (!o) {
+      return `<tr class="missing"><td><div class="city">${tier}</div></td><td class="px">—</td><td class="px">—</td><td class="px">—</td>
+        <td class="pl"><span class="nodata">데이터 없음</span></td>${bar(0, 0)}<td class="age">—</td></tr>`;
+    }
+    const a = ago(o.updated);
+    return `<tr class="${o === x.best ? 'best' : ''}">
+      <td><div class="city">${label(o.item)}</div>
+        <div class="detail"><span class="nw">개당 ${signed(o.unit)}</span> · <span class="nw">${fmt(o.units)}개</span> · <span class="nw">자금 ${fmt(o.need)}</span><span class="nw"> · ${a.text}</span></div></td>
+      <td class="px${o.avgBuy || o.avgSell ? ' avg' : ''}">${signed(o.unit)}</td>
+      <td class="px">${fmt(o.units)}개${o.byBudget ? '<span class="tag"> 자금 한도</span>' : ''}</td>
+      <td class="px">${fmt(o.need)}</td>
+      <td class="pl">${signed(o.trip)}</td>
+      ${bar(o.trip, Math.abs(o.trip) / max)}
+      <td class="age">${a.text}</td>
+    </tr>`;
+  }).join('');
+  if (changed) grow($('#tiers'));
+}
+
+$('#trows').addEventListener('click', (e) => {
+  const b = e.target.closest('.pick');
+  if (!b || b.dataset.city === trade.dest) return;
+  trade.dest = b.dataset.city;
+  for (const p of document.querySelectorAll('#trows .pick')) p.setAttribute('aria-pressed', String(p === b));
+  for (const t of document.querySelectorAll('#trows .city .tag')) t.remove();
+  b.insertAdjacentHTML('afterend', '<span class="tag">티어별 보기</span>');
+  renderTiers(true);
+});
+
+const scheduleTradeAuto = autoRefresh(tform, () => loadTrade(true, true), () => trade.at);
+tform.addEventListener('change', (e) => {
+  const f = tform.elements;
+  if (e.target.name === 'auto') {
+    scheduleTradeAuto();
+    return;
+  }
+  if (e.target.name === 'mount' && OX_KG[f.mount.value]) f.kg.value = OX_KG[f.mount.value];
+  if (e.target.name === 'kg' && Number(f.kg.value) !== OX_KG[f.mount.value]) f.mount.value = '0';
+  loadTrade(false);
+});
+tform.addEventListener('submit', (e) => e.preventDefault());
+$('#trefresh').addEventListener('click', () => loadTrade(true));
+onShow['tab-trade'] = () => { if (!trade.at && !$('#trefresh').disabled) loadTrade(false); };
+
+/* ---------- notes ---------- */
+let notes = [];
+
+async function loadNotes() {
+  const answer = $('#nanswer');
+  answer.className = 'answer loading';
+  answer.innerHTML = '<h1>자료를 불러오는 중…</h1>';
+  try {
+    const r = await fetch('/api/notes');
+    const d = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(d.error || `HTTP ${r.status}`);
+    if (!d.enabled) {
+      answer.className = 'answer';
+      answer.innerHTML = '<h1>자료 저장소가 꺼져 있습니다</h1><p>서버에 DATABASE_URL이 없어서 코치가 찾은 내용을 저장하지 않습니다. docker compose로 실행하면 켜집니다.</p>';
+      $('#nlist').innerHTML = '';
+      return;
+    }
+    notes = d.notes;
+    renderNotes();
+  } catch (e) {
+    answer.className = 'answer error';
+    answer.innerHTML = `<h1>자료를 불러오지 못했습니다</h1><p>${esc(e.message)}. 잠시 뒤 자료 탭을 다시 열어 보세요.</p>`;
+    $('#nlist').innerHTML = '';
+  }
+}
+
+function renderNotes() {
+  const answer = $('#nanswer');
+  answer.className = 'answer';
+  answer.innerHTML = notes.length
+    ? `<h1>코치가 모은 자료 ${notes.length}건</h1><p>가장 최근: ${esc(notes[0].topic)} · ${ago(notes[0].updated).text}</p>`
+    : '<h1>아직 쌓인 자료가 없습니다</h1><p>코치에게 가이드에 없는 것(섬, 길드, 최신 패치 같은 것)을 물어보면, 웹에서 찾은 사실을 출처와 함께 여기에 모읍니다.</p>';
+  $('#nlist').innerHTML = notes.map((n) => {
+    const days = (Date.now() - Date.parse(n.updated)) / 864e5;
+    const links = n.sources.filter((src) => /^https?:\/\//.test(src.url))
+      .map((src) => `<a href="${esc(src.url)}" target="_blank" rel="noopener noreferrer">${esc(src.title || src.url)}</a>`).join(' · ');
+    return `<li class="note" data-id="${n.id}">
+      <div class="note-head"><h3>${esc(n.topic)}</h3><span class="age">${ago(n.updated).text}${days > 30 ? ' · 다시 확인 예정' : ''}</span></div>
+      <div class="note-body">${md(n.body)}</div>
+      <div class="note-foot"><p class="note-src">출처: ${links || '없음'}</p><button type="button" class="ghost del">지우기</button></div>
+    </li>`;
+  }).join('');
+}
+
+$('#nlist').addEventListener('click', async (e) => {
+  const b = e.target.closest('.del');
+  if (!b) return;
+  const li = b.closest('.note');
+  if (!b.dataset.armed) { // two presses, like 대화 지우기
+    b.dataset.armed = '1';
+    b.textContent = '한 번 더 누르면 지워집니다';
+    setTimeout(() => { delete b.dataset.armed; b.textContent = '지우기'; }, 3000);
+    return;
+  }
+  b.disabled = true;
+  try {
+    const r = await fetch(`/api/notes/${li.dataset.id}`, { method: 'DELETE' });
+    if (!r.ok) throw new Error((await r.json().catch(() => ({}))).error || `HTTP ${r.status}`);
+    notes = notes.filter((n) => String(n.id) !== li.dataset.id);
+    renderNotes();
+  } catch (err) {
+    b.disabled = false;
+    li.querySelector('.err')?.remove();
+    li.insertAdjacentHTML('beforeend', `<p class="err">지우지 못했습니다: ${esc(err.message)}. 다시 눌러 보세요.</p>`);
+  }
+});
+onShow['tab-notes'] = loadNotes;
 
 /* ---------- coach ---------- */
 const KEY = 'albion-coach.chat.v1';
@@ -326,7 +588,7 @@ $('#clear').addEventListener('click', (e) => {
 fetch('/api/status').then((r) => r.json()).then((s) => {
   coachOn = Boolean(s.coach);
   if (!coachOn) {
-    $('.starters-lead').textContent = '코치는 Claude API 키가 있어야 열려요. 맥의 albion-coach 폴더에 .env 파일을 만들어 ANTHROPIC_API_KEY=sk-ant-... 한 줄을 넣고 scripts/rolling-update.sh를 실행하면 됩니다. 정제 계산기는 키 없이 동작합니다.';
+    $('.starters-lead').textContent = '코치는 Claude API 키가 있어야 열려요. 맥의 albion-coach 폴더에 .env 파일을 만들어 ANTHROPIC_API_KEY=sk-ant-... 한 줄을 넣고 scripts/rolling-update.sh를 실행하면 됩니다. 무역 루트와 정제 계산기는 키 없이 동작합니다.';
     document.querySelectorAll('.starter').forEach((b) => { b.disabled = true; });
     $('#send').disabled = true;
     $('#q').disabled = true;
@@ -334,3 +596,5 @@ fetch('/api/status').then((r) => r.json()).then((s) => {
   }
 }).catch(() => {});
 drawLog();
+
+showTab(Object.keys(HASH).find((k) => HASH[k] === location.hash) || 'tab-trade');

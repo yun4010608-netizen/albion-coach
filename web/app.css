@@ -51,20 +51,20 @@ button, input, select, textarea { font: inherit; color: inherit; }
 }
 .brand { font-weight: 700; font-size: 17px; letter-spacing: -0.01em; }
 .server { margin-left: auto; color: var(--mute); font-size: 13px; }
-.tabs { display: none; gap: 2px; height: 100%; }
+.tabs { display: flex; gap: 2px; height: 100%; }
 .tabs button {
   background: none; border: 0; padding: 0 12px; color: var(--mute); cursor: pointer; height: 100%;
 }
 .tabs button[aria-selected="true"] { color: var(--ink); box-shadow: inset 0 -2px var(--ink); }
 
-/* panes */
+/* panes: boards (무역 루트, 정제, 자료) share the left column; the coach keeps the right one */
 .panes {
-  display: grid; grid-template-columns: minmax(0, 1fr) var(--pane-coach);
+  display: grid; grid-template-columns: minmax(0, 1fr) var(--pane-coach); grid-template-rows: minmax(0, 1fr);
   height: calc(100dvh - 56px);
 }
-.pane { overflow-y: auto; }
-.calc { padding: 20px 28px 32px; border-right: 1px solid var(--rule); }
-.coach { display: flex; flex-direction: column; }
+.pane { overflow-y: auto; grid-row: 1; }
+.board { grid-column: 1; padding: 20px 28px 32px; border-right: 1px solid var(--rule); }
+.coach { grid-column: 2; display: flex; flex-direction: column; }
 
 /* filters: standard controls */
 .filters { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; margin-bottom: 24px; }
@@ -76,10 +76,13 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .seg input:checked + span { background: var(--ink); color: var(--ground); font-weight: 600; }
 .seg input:focus-visible + span { outline: 1px solid var(--focus); outline-offset: -3px; }
 .sel { display: flex; align-items: center; gap: 8px; color: var(--mute); font-size: 13px; }
-.sel input { width: 7ch; background: var(--raise); border: 1px solid var(--edge); border-radius: 2px; padding: 6px 8px; color: var(--ink); }
+.sel input { width: 8ch; background: var(--raise); border: 1px solid var(--edge); border-radius: 2px; padding: 6px 8px; color: var(--ink); }
 .sel select {
   background: var(--raise); border: 1px solid var(--edge); border-radius: 2px; padding: 6px 8px; color: var(--ink);
 }
+.sel input.wide { width: 12ch; }
+.sel input::placeholder { color: var(--mute); }
+.unit { margin-left: -4px; }
 .chk { display: flex; align-items: center; gap: 6px; cursor: pointer; }
 .chk input { accent-color: var(--ink); width: 15px; height: 15px; margin: 0; }
 .ghost {
@@ -87,7 +90,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
 }
 .ghost:hover { color: var(--ink); border-color: var(--ink); }
 .ghost:disabled { opacity: .45; cursor: default; }
-#refresh { margin-left: auto; }
+.refresh { margin-left: auto; }
 
 /* the answer sentence */
 .answer { min-height: 112px; padding-bottom: 20px; border-bottom: 1px solid var(--rule); }
@@ -130,6 +133,33 @@ tr.best td:first-child { font-weight: 700; }
 .fresh { animation: tick 2.4s cubic-bezier(.16, 1, .3, 1); }
 @keyframes tick { from { background: color-mix(in srgb, var(--amber) 22%, transparent); } to { background: transparent; } }
 
+/* trade route: destination rows pick the city the tier table explains */
+.pick {
+  display: inline-flex; align-items: baseline; gap: 8px; background: none; border: 0; padding: 0; margin: 0;
+  color: inherit; font: inherit; text-align: left; cursor: pointer;
+}
+.pick:hover .cname { text-decoration: underline; text-decoration-color: var(--mute); text-underline-offset: 3px; }
+.trade td.item { color: var(--ink); }
+.subhead { margin: 32px 0 0; font-size: 15px; font-weight: 600; letter-spacing: -0.01em; }
+.subhead:empty { display: none; }
+.subhead + .ladder { margin-top: 0; }
+.tiers:has(tbody:empty) { display: none; }
+
+/* notes */
+.notes { list-style: none; margin: 0; padding: 0; max-width: 72ch; }
+.note { padding: 16px 0; border-bottom: 1px solid var(--rule); }
+.note-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; }
+.note h3 { margin: 0; font-size: 15px; font-weight: 600; letter-spacing: -0.01em; }
+.note .age { color: var(--mute); font-size: 13px; white-space: nowrap; }
+.note-body { margin-top: 6px; line-height: 1.65; }
+.note-body p { margin: 0 0 6px; }
+.note-body ul, .note-body ol { margin: 0 0 6px; padding-left: 20px; }
+.note-body ul { list-style: disc; }
+.note-foot { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 8px; }
+.note-src { margin: 0; color: var(--mute); font-size: 13px; }
+.note .del { flex: none; }
+.note .err { color: var(--ink); font-size: 13px; margin: 8px 0 0; }
+
 .route { color: var(--ink); margin: 18px 0 0; max-width: 72ch; }
 .route:empty { display: none; }
 #autonote:empty { display: none; }
@@ -162,26 +192,36 @@ tr.best td:first-child { font-weight: 700; }
 #send:disabled { opacity: .5; cursor: default; }
 .ask textarea:disabled { opacity: .6; }
 
+@media (min-width: 1100px) {
+  .tabs .t-coach { display: none; }
+  .board.is-left-off { display: none; }
+}
 /* one pane at a time below 1100px */
 @media (max-width: 1099px) {
-  .tabs { display: flex; }
   .panes { grid-template-columns: minmax(0, 1fr); }
-  .calc { border-right: 0; }
+  .board { border-right: 0; }
+  .coach { grid-column: 1; }
   .pane.is-off { display: none; }
+}
+@media (max-width: 480px) {
+  .server { display: none; }
 }
 @media (max-width: 760px) {
   :root { --bar-max: 40px; }
   .bar { gap: 12px; }
-  .calc { padding: 16px 16px 28px; }
+  .board { padding: 16px 16px 28px; }
+  .long { display: none; }
+  .tabs button { padding: 0 10px; }
   .log, .starters { padding-left: 16px; padding-right: 16px; }
   .ask { padding-left: 16px; padding-right: 16px; }
-  #refresh { margin-left: 0; }
+  .refresh { margin-left: 0; }
   .ladder .px { display: none; }
   .detail { display: block; }
   .avg-tag { display: inline; }
   .axis-h, td.axis { padding-left: 8px; padding-right: 0; }
   .age-h, td.age { display: none; }
   .sel select, .sel input, .ghost, .chk, .starter { min-height: 44px; }
+  .note-foot { align-items: flex-end; }
   .seg span { padding: 11px 13px; }
   .chk input { width: 20px; height: 20px; }
 }

@@ -12,14 +12,83 @@
 <header class="bar">
   <span class="brand">알비온 코치</span>
   <nav class="tabs" role="tablist" aria-label="화면 전환">
-    <button role="tab" id="tab-calc" aria-controls="pane-calc" aria-selected="true">정제 계산기</button>
-    <button role="tab" id="tab-coach" aria-controls="pane-coach" aria-selected="false">코치</button>
+    <button role="tab" id="tab-trade" aria-controls="pane-trade" aria-selected="true">무역<span class="long"> 루트</span></button>
+    <button role="tab" id="tab-calc" aria-controls="pane-calc" aria-selected="false">정제<span class="long"> 계산기</span></button>
+    <button role="tab" id="tab-notes" aria-controls="pane-notes" aria-selected="false">자료</button>
+    <button role="tab" id="tab-coach" aria-controls="pane-coach" aria-selected="false" class="t-coach">코치</button>
   </nav>
   <span class="server" title="Albion Online Asia 서버 시세">Asia 서버</span>
 </header>
 
 <main class="panes">
-  <section id="pane-calc" class="pane calc" role="tabpanel" aria-labelledby="tab-calc">
+  <section id="pane-trade" class="pane board" role="tabpanel" aria-labelledby="tab-trade">
+    <form id="tfilters" class="filters" aria-label="무역 조건">
+      <label class="sel">출발
+        <select name="from">
+          <option>Bridgewatch</option><option>Brecilien</option><option>Caerleon</option><option>Fort Sterling</option>
+          <option>Lymhurst</option><option selected>Martlock</option><option>Thetford</option>
+        </select>
+      </label>
+      <label class="sel">탈것
+        <select name="mount">
+          <option value="3">운송용 소 T3</option><option value="4" selected>운송용 소 T4</option><option value="5">운송용 소 T5</option>
+          <option value="6">운송용 소 T6</option><option value="7">운송용 소 T7</option><option value="8">운송용 소 T8</option>
+          <option value="0">직접 입력</option>
+        </select>
+      </label>
+      <label class="sel" title="게임 인벤토리에 나오는 최대 무게를 넣으면 정확해집니다">실을 무게
+        <input type="number" name="kg" min="1" max="20000" step="1" value="517" inputmode="numeric"><span class="unit">kg</span>
+      </label>
+      <label class="sel">자금
+        <input type="number" name="budget" min="0" step="10000" placeholder="제한 없음" inputmode="numeric" class="wide">
+      </label>
+      <label class="sel">인챈트
+        <select name="enchant">
+          <option value="0" selected>.0</option><option value="1">.1</option><option value="2">.2</option><option value="3">.3</option><option value="4">.4</option>
+        </select>
+      </label>
+      <label class="chk"><input type="checkbox" name="premium" checked><span>프리미엄</span></label>
+      <label class="chk"><input type="checkbox" name="auto"><span>자동 새로고침 (5분)</span></label>
+      <button type="button" id="trefresh" class="ghost refresh">시세 새로고침</button>
+    </form>
+
+    <div id="tanswer" class="answer" aria-live="polite"></div>
+
+    <table class="ladder trade" aria-describedby="tanswer">
+      <thead>
+        <tr>
+          <th scope="col">도착 도시</th>
+          <th scope="col" class="px">물건</th>
+          <th scope="col" class="px">사는 값</th>
+          <th scope="col" class="px">파는 값</th>
+          <th scope="col" class="pl">한 번 운반</th>
+          <th scope="col" class="axis-h"><span class="sr">이익 막대</span></th>
+          <th scope="col" class="age-h">갱신</th>
+        </tr>
+      </thead>
+      <tbody id="trows"></tbody>
+    </table>
+
+    <h2 id="ttitle" class="subhead"></h2>
+    <table class="ladder tiers" aria-labelledby="ttitle">
+      <thead>
+        <tr>
+          <th scope="col">티어</th>
+          <th scope="col" class="px">개당</th>
+          <th scope="col" class="px">실을 수</th>
+          <th scope="col" class="px">필요 자금</th>
+          <th scope="col" class="pl">한 번 운반</th>
+          <th scope="col" class="axis-h"><span class="sr">이익 막대</span></th>
+          <th scope="col" class="age-h">갱신</th>
+        </tr>
+      </thead>
+      <tbody id="tiers"></tbody>
+    </table>
+    <p id="tautonote" class="source" aria-live="polite"></p>
+    <p class="source">출발 도시에서 최저가 판매 주문을 사서, 도착 도시에 판매 주문으로 파는 기준입니다. 최저가 주문의 수량은 알 수 없어서 많이 사면 더 비싸질 수 있습니다. 탈것 무게는 게임 데이터로 계산한 추정치라, 게임 인벤토리의 최대 무게로 바꿔 넣으면 정확해집니다. 이동 시간과 PvP 위험은 빠져 있습니다.</p>
+  </section>
+
+  <section id="pane-calc" class="pane board" role="tabpanel" aria-labelledby="tab-calc">
     <form id="filters" class="filters" aria-label="정제 조건">
       <fieldset class="seg" aria-label="자원">
         <label><input type="radio" name="resource" value="ore" checked><span>광석</span></label>
@@ -45,7 +114,7 @@
       <label class="chk"><input type="checkbox" name="premium" checked><span>프리미엄</span></label>
       <label class="chk"><input type="checkbox" name="focus"><span>포커스 사용</span></label>
       <label class="chk"><input type="checkbox" name="auto"><span>자동 새로고침 (5분)</span></label>
-      <button type="button" id="refresh" class="ghost">시세 새로고침</button>
+      <button type="button" id="refresh" class="ghost refresh">시세 새로고침</button>
     </form>
 
     <div id="answer" class="answer" aria-live="polite"></div>
@@ -69,12 +138,18 @@
     <p class="source">시세: <a href="https://www.albion-online-data.com/" target="_blank" rel="noopener">Albion Online Data Project</a> (플레이어가 수집한 데이터라 늦거나 빠진 값이 있을 수 있음). 6시간 안의 주문가가 없으면 최근 7일 중 마지막 하루 평균 거래가를 회색으로 씁니다. 정제는 판매 주문으로 파는 것을 기준으로 계산합니다.</p>
   </section>
 
+  <section id="pane-notes" class="pane board" role="tabpanel" aria-labelledby="tab-notes">
+    <div id="nanswer" class="answer" aria-live="polite"></div>
+    <ol id="nlist" class="notes"></ol>
+    <p class="source">코치는 웹을 다시 찾기 전에 이 자료를 먼저 씁니다. 30일이 지난 자료는 다시 확인하고 고쳐 씁니다.</p>
+  </section>
+
   <section id="pane-coach" class="pane coach" role="tabpanel" aria-labelledby="tab-coach">
     <ol id="log" class="log" aria-live="polite"></ol>
     <div id="starters" class="starters">
       <p class="starters-lead">무엇이든 물어보세요. 시세와 공개 캐릭터 명성을 확인해서 답합니다.</p>
       <button type="button" class="starter">첫날 뭐부터 해야 해?</button>
-      <button type="button" class="starter">T4 광석 지금 정제하면 이득이야?</button>
+      <button type="button" class="starter">Martlock에서 뭘 사서 어디로 옮기면 남아?</button>
       <button type="button" class="starter">채집이랑 전투 중에 뭘 먼저 키워야 해?</button>
     </div>
     <form id="ask" class="ask">

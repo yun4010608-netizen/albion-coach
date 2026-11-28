@@ -1,16 +1,20 @@
 package main
 
 import (
+	"cmp"
 	"context"
 	"embed"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io/fs"
 	"log/slog"
 	"net/http"
 	"os"
 	"os/signal"
+	"slices"
 	"strconv"
+	"strings"
 	"sync/atomic"
 	"syscall"
 	"time"
@@ -32,6 +36,7 @@ type App struct {
 	gameinfo *Gameinfo
 	names    map[string]string
 	coach    *Coach
+	notes    *Notes // nil without DATABASE_URL
 	draining atomic.Bool
 }
 
@@ -61,6 +66,34 @@ func (a *App) Refine(ctx context.Context, res string, tier, enchant int, premium
 		}
 	}
 	return computeRefine(rec, prices, premium, fee, resources[res].bonusCity, time.Now()), nil
+}
+
+var errBadInput = errors.New("잘못된 요청")
+
+// Trade validates its input because the coach's tool calls reach it as well as the page.
+func (a *App) Trade(ctx context.Context, from string, enchant int, kg float64, budget int, premium, fresh bool) (TradeResult, error) {
+	switch {
+	case !slices.Contains(cities, from):
+		return TradeResult{}, fmt.Errorf("%w: 출발 도시는 %s 중 하나여야 합니다", errBadInput, strings.Join(cities, ", "))
+	case kg < 1 || kg > 20000:
+		return TradeResult{}, fmt.Errorf("%w: 실을 무게는 1-20000kg이어야 합니다", errBadInput)
+	case budget < 0:
+		return TradeResult{}, fmt.Errorf("%w: 자금은 0 이상이어야 합니다", errBadInput)
+	}
+	items, err := tradeItems(enchant)
+	if err != nil {
+		return TradeResult{}, fmt.Errorf("%w: %v", errBadInput, err)
+	}
+	ids := make([]string, len(items))
+	for i := range items {
+		ids[i] = items[i].ID
+		items[i].Name = a.names[items[i].ID]
+	}
+	prices, err := a.market.Prices(ctx, ids, fresh)
+	if err != nil {
+		return TradeResult{}, err
+	}
+	return computeTrade(from, items, prices, kg, budget, premium), nil
 }
 
 func writeJSON(w http.ResponseWriter, code int, v any) {
@@ -120,6 +153,59 @@ func (a *App) routes() http.Handler {
 		writeJSON(w, http.StatusOK, res)
 	})
 
+	mux.HandleFunc("GET /api/trade", func(w http.ResponseWriter, r *http.Request) {
+		q := r.URL.Query()
+		enchant, err1 := strconv.Atoi(q.Get("enchant"))
+		kg, err2 := strconv.ParseFloat(q.Get("kg"), 64)
+		budget, err3 := strconv.Atoi(cmp.Or(q.Get("budget"), "0"))
+		if err1 != nil || err2 != nil || err3 != nil {
+			fail(w, http.StatusBadRequest, "enchant, kg, budget는 숫자여야 합니다")
+			return
+		}
+		res, err := a.Trade(r.Context(), q.Get("from"), enchant, kg, budget, q.Get("premium") == "1", q.Get("fresh") == "1")
+		if err != nil {
+			code := http.StatusBadGateway
+			if errors.Is(err, errBadInput) {
+				code = http.StatusBadRequest
+			}
+			fail(w, code, err.Error())
+			return
+		}
+		writeJSON(w, http.StatusOK, res)
+	})
+
+	mux.HandleFunc("GET /api/notes", func(w http.ResponseWriter, r *http.Request) {
+		if a.notes == nil {
+			writeJSON(w, http.StatusOK, map[string]any{"enabled": false})
+			return
+		}
+		ctx, cancel := context.WithTimeout(r.Context(), 5*time.Second)
+		defer cancel()
+		list, err := a.notes.List(ctx)
+		if err != nil {
+			slog.Error("notes list", "err", err)
+			fail(w, http.StatusBadGateway, "자료 저장소에 연결하지 못했습니다")
+			return
+		}
+		writeJSON(w, http.StatusOK, map[string]any{"enabled": true, "notes": list})
+	})
+
+	mux.HandleFunc("DELETE /api/notes/{id}", func(w http.ResponseWriter, r *http.Request) {
+		id, err := strconv.ParseInt(r.PathValue("id"), 10, 64)
+		if err != nil || a.notes == nil {
+			fail(w, http.StatusBadRequest, "지울 자료가 없습니다")
+			return
+		}
+		ctx, cancel := context.WithTimeout(r.Context(), 5*time.Second)
+		defer cancel()
+		if err := a.notes.Delete(ctx, id); err != nil {
+			slog.Error("notes delete", "err", err)
+			fail(w, http.StatusBadGateway, "자료 저장소에 연결하지 못했습니다")
+			return
+		}
+		w.WriteHeader(http.StatusNoContent)
+	})
+
 	mux.HandleFunc("POST /api/chat", func(w http.ResponseWriter, r *http.Request) {
 		if a.coach == nil {
 			fail(w, http.StatusServiceUnavailable, "서버에 ANTHROPIC_API_KEY가 없어 코치를 쓸 수 없습니다")
@@ -176,6 +262,16 @@ func main() {
 		slog.Error("names.json", "err", err)
 		os.Exit(1)
 	}
+	if url := os.Getenv("DATABASE_URL"); url != "" {
+		notes, err := OpenNotes(url)
+		if err != nil {
+			slog.Error("DATABASE_URL", "err", err)
+			os.Exit(1)
+		}
+		app.notes = notes
+	} else {
+		slog.Warn("DATABASE_URL not set: the coach will not keep what it finds")
+	}
 	model := env("CLAUDE_MODEL", "claude-sonnet-5-5")
 	if os.Getenv("ANTHROPIC_API_KEY") != "" {
 		coach, err := NewCoach(anthropic.NewClient(), model, guideMD, app)
@@ -204,12 +300,15 @@ func main() {
 			slog.Error("shutdown", "err", err)
 		}
 	}()
-	slog.Info("listening", "addr", srv.Addr, "coach", app.coach != nil, "model", model)
+	slog.Info("listening", "addr", srv.Addr, "coach", app.coach != nil, "model", model, "notes", app.notes != nil)
 	if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 		slog.Error("serve", "err", err)
 		os.Exit(1)
 	}
 	// ListenAndServe returns as soon as Shutdown starts; exiting here would cut in-flight answers.
 	<-drained
+	if app.notes != nil {
+		app.notes.db.Close()
+	}
 	slog.Info("stopped")
 }

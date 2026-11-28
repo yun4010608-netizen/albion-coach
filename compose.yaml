@@ -5,8 +5,12 @@ services:
     environment:
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
       CLAUDE_MODEL: ${CLAUDE_MODEL:-claude-sonnet-5-5}
+      # Notes the coach keeps. The app starts without the database and connects on first use.
+      DATABASE_URL: postgres://albion:${POSTGRES_PASSWORD:-albion-coach-local}@db:5432/albion?sslmode=disable
     deploy:
       replicas: 2
+    # Come back by themselves after a Docker/VM restart; an explicit stop (rolling scripts, compose down) stays stopped.
+    restart: unless-stopped
     # A coach answer can take up to 3 minutes; let in-flight answers finish on stop.
     stop_grace_period: 210s
     healthcheck:
@@ -22,6 +26,7 @@ services:
   lb:
     # 1.30.7: 2026-11-18 fix for CVE-2026-123007 (HTTP/2 RCE) and nine others.
     image: nginx:1.30.7-alpine3.24
+    restart: unless-stopped
     ports:
       - "8080:8080"
     volumes:
@@ -29,3 +34,25 @@ services:
     depends_on:
       app:
         condition: service_healthy
+
+  db:
+    # 18.7: 2026-11-12 security release (52 CVEs, CVE-2026-6460 among them).
+    image: postgres:18.7-alpine3.24
+    environment:
+      POSTGRES_USER: albion
+      # Set once in .env before the first start; the volume keeps the password it was created with.
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-albion-coach-local}
+      POSTGRES_DB: albion
+    volumes:
+      - notes:/var/lib/postgresql # PostgreSQL 18 images keep data under /var/lib/postgresql/18
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "albion", "-d", "albion"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+    stop_grace_period: 30s
+    # No published port: only the app replicas on the compose network reach it.
+
+volumes:
+  notes:
